@@ -6,7 +6,7 @@ import { Trash2 } from "lucide-react";
 import Link from "next/link";
 
 export function CartSummary() {
-    const { items, getTotalPrice, removeItem, updateQuantity } = useCartStore();
+    const { items, getTotalPrice, removeFromCart, updateQuantity } = useCartStore();
     const total = getTotalPrice();
 
     if (items.length === 0) {
