@@ -37,19 +37,19 @@ export default function Home() {
           <div className="lg:col-span-7 relative z-0 order-1 lg:order-2 h-full min-h-[500px] flex items-center justify-center lg:justify-end">
             <div className="relative w-full max-w-2xl aspect-[4/3]">
 
-              {/* Main Image */}
+              {/* Main Image - Switched to Vada Pav (Strictly Veg) */}
               <div className="relative w-full h-full rounded-[2.5rem] overflow-hidden shadow-2xl border-[8px] border-white">
                 <img
-                  src="https://images.unsplash.com/photo-1606491956689-2ea28c674675?q=80&w=1000&auto=format&fit=crop"
-                  alt="Pav Bhaji Platter"
+                  src="https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&q=80&w=1000"
+                  alt="Famous Mumbai Vada Pav"
                   className="w-full h-full object-cover"
                 />
               </div>
 
-              {/* Floating Card 1 */}
+              {/* Floating Card 1 - Samosa (Veg) */}
               <div className="absolute top-8 -right-4 glass-pro rounded-2xl p-3 w-48 z-20 shadow-xl bg-white/80 backdrop-blur-md">
                 <div className="relative h-28 w-full rounded-xl overflow-hidden mb-3">
-                  <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=300&q=80" alt="Samosa" className="w-full h-full object-cover" />
+                  <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=300&q=80" alt="Samosa Plate" className="w-full h-full object-cover" />
                 </div>
                 <div className="px-1">
                   <h3 className="font-bold text-slate-900 text-sm">Samosa Plate</h3>
@@ -58,7 +58,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Floating Card 2 */}
+              {/* Floating Card 2 - Dahi Puri (Veg) */}
               <div className="absolute -bottom-6 -left-4 glass-pro rounded-2xl p-3 w-44 z-20 shadow-xl bg-white/80 backdrop-blur-md">
                 <div className="relative h-24 w-full rounded-xl overflow-hidden mb-3">
                   <img src="https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=300&q=80" alt="Dahi Puri" className="w-full h-full object-cover" />
