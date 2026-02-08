@@ -15,15 +15,15 @@ export default function Home() {
             <div className="flex flex-col justify-center space-y-8 animate-fade-in">
               <div className="inline-flex items-center rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-sm font-medium text-brand-600 w-fit">
                 <span className="flex h-2 w-2 rounded-full bg-brand-600 mr-2 animate-pulse"></span>
-                Open for Orders
+                Manomay Kiosk
               </div>
               <div className="space-y-4">
-                <h1 className="text-5xl font-display font-bold tracking-tighter sm:text-6xl xl:text-7xl/none text-slate-900">
+                <h1 className="text-5xl font-display font-bold tracking-tight sm:text-6xl xl:text-7xl/none text-slate-900">
                   Taste the <br />
-                  <span className="text-brand-600">Tradition</span>
+                  <span className="text-brand-600 italic">Tradition</span>
                 </h1>
                 <p className="max-w-[600px] text-slate-600 md:text-xl leading-relaxed">
-                  Experience authentic street food flavors cooked with passion.
+                  Experience authentic modern Indian street food.
                   Fresh ingredients, secret recipes, and served with a smile.
                 </p>
               </div>
@@ -34,7 +34,7 @@ export default function Home() {
                   </Button>
                 </Link>
                 <Link href="/menu">
-                  <Button variant="outline" size="lg" className="h-14 px-8 text-lg rounded-full border-2 hover:bg-slate-50">
+                  <Button variant="outline" size="lg" className="h-14 px-8 text-lg rounded-full border-2 hover:bg-white hover:text-brand-600">
                     View Menu
                   </Button>
                 </Link>
