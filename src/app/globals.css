@@ -82,4 +82,16 @@
     .glass-dark {
         @apply bg-black/60 backdrop-blur-lg border border-white/10 shadow-xl;
     }
+
+    .bg-mandala {
+        background-color: #f8fafc;
+        background-image: radial-gradient(#e2e8f0 1.5px, transparent 1.5px), radial-gradient(#e2e8f0 1.5px, #f8fafc 1.5px);
+        background-size: 30px 30px;
+        background-position: 0 0, 15px 15px;
+    }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+        box-shadow: 0 4px 14px 0 rgba(234, 88, 12, 0.39);
+    }
 }
