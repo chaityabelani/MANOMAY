@@ -1,33 +1,30 @@
-# Deployment Instructions
+# Deploying Manomay Kiosk to Vercel
 
-Follow these steps to deploy the Manomay Kiosk Website to Vercel.
+Your codebase is now optimized for a **"One-Click Deploy"** experience.
 
-## 1. Push to GitHub
-1. Create a new repository on GitHub (e.g., `manomay-kiosk`).
-2. Run the following commands in your terminal (inside the `manomay-kiosk` folder):
-
+## 1. Pre-Deployment Check
+Ensure you have committed all the latest changes:
 ```bash
-git init
 git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/manomay-kiosk.git
-git push -u origin main
+git commit -m "chore: Prepare for Vercel production deployment"
+git push
 ```
 
-## 2. Deploy to Vercel
-1. Log in to [Vercel](https://vercel.com).
-2. Click **"Add New..."** -> **"Project"**.
-3. Select the `manomay-kiosk` repository you just pushed.
-4. Click **"Import"**.
-5. In the "Configure Project" screen:
-   - **Framework Preset**: Next.js (should be auto-detected).
-   - **Root Directory**: Ensure it is set to `.`.
-   - **Build Command**: `next build` (default).
-   - **Installation Command**: `npm install` (default).
-6. Click **"Deploy"**.
+## 2. Deploy on Vercel
+1.  Go to the [Vercel Dashboard](https://vercel.com/dashboard).
+2.  Click **"Add New..."** -> **"Project"**.
+3.  Import your `MANOMAY` repository.
+4.  **Framework Preset**: Select `Next.js`.
+5.  **Root Directory**: Leave empty (since your `package.json` is at the root).
+6.  **Build Command**: `next build` (Default).
+7.  **Environment Variables**: None currently required.
+8.  Click **Deploy**.
 
-## 3. Verify Deployment
-- Vercel will install dependencies, build the project, and deploy it.
-- Once finished, you will get a URL (e.g., `https://manomay-kiosk.vercel.app`).
-- Open the URL on your kiosk device or browser to test.
+## 3. Important Notes
+-   **Images**: We have configured `next.config.mjs` to allow images from `images.unsplash.com`. If you use other image sources, add their domains there.
+-   **Styling**: `tailwind.config.mjs` is correctly pointing to the `src/app` directory.
+
+## 4. Troubleshooting
+If you see a 404 on deployment:
+-   Check `VERCEL_404_FIX.md`.
+-   Verify your `Root Directory` setting in Vercel is clear.

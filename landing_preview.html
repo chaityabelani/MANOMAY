@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manomay Kiosk - Taste the Tradition</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#f97316',
+                            600: '#ea580c', // Saffron Orange
+                            700: '#c2410c',
+                        },
+                        slate: {
+                            900: '#0f172a', // Deep Charcoal
+                            50: '#f8fafc',  // Off-white background
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 1s ease-out forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Utilities not in Tailwind default */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1); /* Extremely subtle */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .text-shadow-sm {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .mesh-gradient {
+            background-color: #f8fafc;
+            background-image: 
+                radial-gradient(at 100% 0%, hsla(28,100%,74%,0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, hsla(22,100%,77%,0.15) 0px, transparent 50%);
+        }
+    </style>
+</head>
+<body class="mesh-gradient min-h-screen font-sans text-slate-900 overflow-x-hidden">
+
+    <!-- Navbar (Ghost/Glass) -->
+    <nav class="fixed top-0 left-0 right-0 z-50 p-6 flex justify-between items-center max-w-7xl mx-auto">
+        <div class="flex items-center gap-2">
+            <div class="h-10 w-10 bg-brand-600 rounded-lg flex items-center justify-center text-white font-serif font-bold text-xl shadow-lg">M</div>
+            <span class="font-serif font-bold text-2xl tracking-tight text-slate-900">MANO<span class="text-brand-600">MAY</span></span>
+        </div>
+        <button class="hidden md:block bg-white/50 backdrop-blur-md hover:bg-white text-slate-900 font-medium py-2 px-6 rounded-full border border-slate-200 transition-all shadow-sm hover:shadow-md">
+            Login
+        </button>
+    </nav>
+
+    <!-- Main Hero Section -->
+    <main class="relative min-h-screen flex items-center justify-center p-6 md:p-12 lg:p-20">
+        <div class="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+            
+            <!-- Left Column: Content -->
+            <div class="flex flex-col space-y-8 z-10 animate-fade-in order-2 lg:order-1">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border-brand-200 bg-orange-50/50 w-fit text-brand-700 text-sm font-semibold tracking-wide uppercase">
+                    <span class="w-2 h-2 rounded-full bg-brand-600 animate-pulse"></span>
+                    Authentic Mumbai Street Food
+                </div>
+
+                <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl leading-[0.9] text-slate-900">
+                    Taste the <br>
+                    <span class="text-brand-600 italic relative inline-block">
+                        Tradition
+                        <svg class="absolute w-full h-3 -bottom-1 left-0 text-brand-200 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
+                            <path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
+                        </svg>
+                    </span>
+                </h1>
+
+                <p class="text-lg md:text-xl text-slate-600 max-w-lg leading-relaxed font-light">
+                    Experience the vibrant flavors of India, crafted with passion and served with a story. From spicy Pav Bhaji to refreshing Chaat.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                    <a href="#" class="group relative px-8 py-4 bg-brand-600 text-white font-semibold rounded-full overflow-hidden shadow-xl shadow-orange-200 transition-all hover:scale-105 active:scale-95">
+                        <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                        <span class="relative flex items-center gap-2">
+                            Order Now <span class="group-hover:translate-x-1 transition-transform">→</span>
+                        </span>
+                    </a>
+                    <a href="#" class="px-8 py-4 bg-white text-slate-900 font-medium rounded-full border border-slate-200 hover:bg-slate-50 transition-all shadow-sm hover:shadow-md flex items-center justify-center">
+                        View Menu
+                    </a>
+                </div>
+                
+                <!-- Social Proof / Micro-interaction -->
+                <div class="flex items-center gap-4 pt-8 opacity-80">
+                    <div class="flex -space-x-3">
+                        <img class="w-10 h-10 rounded-full border-2 border-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=64&h=64" alt="User">
+                        <img class="w-10 h-10 rounded-full border-2 border-white object-cover" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=64&h=64" alt="User">
+                        <img class="w-10 h-10 rounded-full border-2 border-white object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=64&h=64" alt="User">
+                    </div>
+                    <div class="text-sm text-slate-500 font-medium">
+                        <span class="text-brand-600 font-bold">4.9/5</span> from 2,000+ cravings
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Visuals -->
+            <div class="relative z-0 order-1 lg:order-2 flex justify-center lg:justify-end animate-fade-in" style="animation-delay: 0.2s;">
+                <!-- Decorative Circle Background -->
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-orange-100/50 rounded-full blur-3xl -z-10 animate-pulse-slow"></div>
+                
+                <!-- Main Image Container -->
+                <div class="relative w-full max-w-lg lg:max-w-xl aspect-square animate-float">
+                    <div class="absolute inset-0 rounded-[3rem] rotate-3 bg-slate-900/5 backdrop-blur-sm -z-10 transform translate-x-4 translate-y-4"></div>
+                    <!-- Image Source: Unsplash (Indian Street Food / Pav Bhaji) -->
+                    <img 
+                        src="https://images.unsplash.com/photo-1606491956689-2ea28c674675?q=80&w=1000&auto=format&fit=crop" 
+                        alt="Delicious Pav Bhaji" 
+                        class="w-full h-full object-cover rounded-[2.5rem] shadow-2xl relative z-10 border-[6px] border-white"
+                    >
+                    
+                    <!-- Floating Badge -->
+                    <div class="absolute -bottom-6 -left-6 bg-white/80 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-white/40 z-20 flex items-center gap-3 animate-float" style="animation-delay: 1s;">
+                        <div class="bg-green-100 p-2 rounded-full text-green-600">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 font-semibold uppercase">Prep Time</p>
+                            <p class="text-slate-900 font-bold">~15 Mins</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
