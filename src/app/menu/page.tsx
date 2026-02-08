@@ -7,7 +7,7 @@ import { CategoryTabs } from "@/components/feature/CategoryTabs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/useCartStore";
-import { ShoppingBag, ArrowRight } from "lucide-react";
+import { ShoppingCart, ArrowRight } from "lucide-react";
 
 export default function MenuPage() {
     const [activeCategory, setActiveCategory] = useState("all");
@@ -20,52 +20,62 @@ export default function MenuPage() {
 
     return (
         <div className="flex flex-col min-h-screen bg-slate-50">
-            {/* Header / Title Section */}
-            <div className="bg-white border-b border-slate-100 pt-8 pb-4">
-                <div className="container mx-auto px-4 md:px-6">
-                    <h1 className="text-4xl font-display font-bold text-slate-900 mb-2">Our Menu</h1>
-                    <p className="text-slate-500">Explore our delicious range of street food classics.</p>
-                </div>
-            </div>
-
             {/* Sticky Category Navigation */}
-            <div className="sticky top-20 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 py-4 shadow-sm transition-all">
-                <div className="container mx-auto px-4 md:px-6">
-                    <CategoryTabs
-                        categories={CATEGORIES}
-                        activeCategory={activeCategory}
-                        onSelect={setActiveCategory}
-                    />
+            <div className="sticky top-[4.5rem] z-40 px-4 md:px-8 py-4 pointer-events-none">
+                <div className="container mx-auto pointer-events-auto">
+                    <div className="glass rounded-full p-2 pl-6 flex items-center justify-between shadow-lg">
+                        <div className="flex-1 overflow-hidden">
+                            <CategoryTabs
+                                categories={CATEGORIES}
+                                activeCategory={activeCategory}
+                                onSelect={setActiveCategory}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
 
             {/* Product Grid */}
-            <div className="flex-1 w-full container mx-auto px-4 md:px-6 py-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-32">
-                    {filteredProducts.map((product) => (
-                        <div key={product.id} className="animate-fade-in">
-                            <ProductCard product={product} />
-                        </div>
-                    ))}
+            <div className="flex-1 p-4 md:p-8 pt-4">
+                <div className="container mx-auto">
+                    <div className="flex items-center justify-between mb-8 px-2">
+                        <h2 className="text-3xl font-display font-bold text-slate-900">
+                            {activeCategory === "all" ? "All Items" : CATEGORIES.find(c => c.id === activeCategory)?.name}
+                        </h2>
+                        <span className="text-slate-500 font-medium">
+                            {filteredProducts.length} items
+                        </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-32">
+                        {filteredProducts.map((product) => (
+                            <div key={product.id} className="animate-fade-in">
+                                <ProductCard product={product} />
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 
             {/* Floating Cart Summary Bar */}
             {getTotalItems() > 0 && (
-                <div className="fixed bottom-6 left-4 right-4 md:left-auto md:right-8 md:bottom-8 z-50 animate-slide-up">
-                    <div className="glass-dark rounded-2xl p-4 md:p-6 shadow-2xl flex items-center justify-between gap-6 max-w-2xl mx-auto md:ml-auto w-full border border-white/10 bg-slate-900 text-white">
-                        <div className="flex items-center gap-4">
-                            <div className="bg-brand-600 p-3 rounded-xl hidden sm:block">
-                                <ShoppingBag className="h-6 w-6 text-white" />
+                <div className="fixed bottom-6 left-4 right-4 z-50 animate-slide-up md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-3xl">
+                    <div className="bg-slate-900 text-white rounded-2xl p-4 shadow-2xl border border-slate-700 flex items-center justify-between gap-4 ring-4 ring-white/20 backdrop-blur-sm">
+                        <div className="flex items-center gap-4 pl-2">
+                            <div className="bg-slate-800 p-3 rounded-xl relative">
+                                <ShoppingCart className="h-6 w-6 text-brand-500" />
+                                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-600 text-[10px] font-bold">
+                                    {getTotalItems()}
+                                </span>
                             </div>
                             <div>
-                                <p className="text-sm text-slate-400 font-medium">{getTotalItems()} items added</p>
-                                <p className="text-2xl font-bold">₹{getTotalPrice()}</p>
+                                <p className="text-xs text-slate-400 font-medium uppercase tracking-wide">Total</p>
+                                <p className="text-xl font-bold">₹{getTotalPrice()}</p>
                             </div>
                         </div>
                         <Link href="/cart">
-                            <Button size="lg" className="h-14 px-8 text-lg font-bold rounded-xl bg-white text-slate-900 hover:bg-brand-50 hover:text-brand-700 transition-colors">
-                                View Cart <ArrowRight className="ml-2 h-5 w-5" />
+                            <Button size="lg" className="rounded-xl px-8 font-bold bg-brand-600 hover:bg-brand-700 text-white shadow-lg shadow-brand-900/20">
+                                View Cart <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
                         </Link>
                     </div>

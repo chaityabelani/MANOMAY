@@ -1,6 +1,7 @@
 "use client";
 
 import { Category } from "@/types";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface CategoryTabsProps {
@@ -11,31 +12,33 @@ interface CategoryTabsProps {
 
 export function CategoryTabs({ categories, activeCategory, onSelect }: CategoryTabsProps) {
     return (
-        <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar items-center">
-            <button
+        <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar px-1">
+            <Button
+                variant="ghost"
                 onClick={() => onSelect("all")}
                 className={cn(
-                    "px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap border",
+                    "rounded-full px-6 transition-all duration-300 border",
                     activeCategory === "all"
-                        ? "bg-brand-600 text-white border-brand-600 shadow-lg shadow-brand-200"
-                        : "bg-white text-slate-600 border-slate-200 hover:border-brand-200 hover:text-brand-600"
+                        ? "bg-brand-600 text-white border-brand-600 hover:bg-brand-700 hover:text-white shadow-md shadow-brand-100"
+                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300"
                 )}
             >
                 All Items
-            </button>
+            </Button>
             {categories.map((category) => (
-                <button
+                <Button
                     key={category.id}
+                    variant="ghost"
                     onClick={() => onSelect(category.id)}
                     className={cn(
-                        "px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap border",
+                        "rounded-full px-6 transition-all duration-300 border",
                         activeCategory === category.id
-                            ? "bg-brand-600 text-white border-brand-600 shadow-lg shadow-brand-200"
-                            : "bg-white text-slate-600 border-slate-200 hover:border-brand-200 hover:text-brand-600"
+                            ? "bg-brand-600 text-white border-brand-600 hover:bg-brand-700 hover:text-white shadow-md shadow-brand-100"
+                            : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300"
                     )}
                 >
                     {category.name}
-                </button>
+                </Button>
             ))}
         </div>
     );
