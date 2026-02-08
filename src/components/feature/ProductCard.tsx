@@ -3,8 +3,8 @@
 import { Product } from "@/types";
 import { useCartStore } from "@/store/useCartStore";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, Flame } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
     product: Product;
@@ -16,58 +16,64 @@ export function ProductCard({ product }: ProductCardProps) {
     const quantity = cartItem?.quantity || 0;
 
     return (
-        <Card className="overflow-hidden flex flex-col h-full border-2 hover:border-blue-400 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 bg-white">
-            <div className="relative h-56 w-full bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden group">
+        <div className="group relative flex flex-col h-full bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden hover:-translate-y-1">
+            {/* Image Container */}
+            <div className="relative h-48 w-full overflow-hidden bg-slate-100">
                 <img
                     src={product.image}
                     alt={product.name}
-                    className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
                 {product.isPopular && (
-                    <span className="absolute top-3 right-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg animate-pulse">
-                        ⭐ POPULAR
-                    </span>
+                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-brand-600 text-xs font-bold px-3 py-1 rounded-full shadow-sm flex items-center gap-1">
+                        <Flame className="w-3 h-3 fill-brand-600" /> POPULAR
+                    </div>
                 )}
             </div>
-            <div className="p-5 flex flex-col flex-1 bg-gradient-to-b from-white to-gray-50">
-                <h3 className="font-bold text-xl leading-tight mb-2 text-gray-800">{product.name}</h3>
-                <p className="text-gray-600 text-sm line-clamp-2 mb-4 flex-1">
+
+            {/* Content Container */}
+            <div className="flex flex-col flex-1 p-5">
+                <h3 className="font-display font-bold text-lg text-slate-800 leading-tight mb-2 group-hover:text-brand-600 transition-colors">
+                    {product.name}
+                </h3>
+                <p className="text-slate-500 text-sm line-clamp-2 mb-4 leading-relaxed flex-1">
                     {product.description}
                 </p>
-                <div className="flex items-center justify-between mt-auto pt-4 border-t">
-                    <span className="font-bold text-2xl text-blue-600">₹{product.price}</span>
+
+                <div className="flex items-center justify-between pt-4 mt-auto border-t border-slate-50">
+                    <span className="font-bold text-xl text-slate-900">
+                        ₹{product.price}
+                    </span>
 
                     {quantity === 0 ? (
                         <Button
                             size="sm"
                             onClick={() => addToCart(product)}
-                            className="px-8 py-6 text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg transform hover:scale-105 transition-transform"
+                            className="bg-slate-900 hover:bg-brand-600 text-white rounded-full px-6 transition-all duration-300 shadow-md hover:shadow-brand-200"
                         >
-                            Add +
+                            Add <Plus className="ml-1 h-4 w-4" />
                         </Button>
                     ) : (
-                        <div className="flex items-center gap-3 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl p-2 shadow-md">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-10 w-10 hover:bg-blue-200 text-blue-700 font-bold rounded-lg"
+                        <div className="flex items-center bg-slate-100 rounded-full p-1">
+                            <button
                                 onClick={() => updateQuantity(product.id, quantity - 1)}
+                                className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-slate-600 shadow-sm hover:text-brand-600 transition-colors"
                             >
-                                <Minus className="h-5 w-5" />
-                            </Button>
-                            <span className="font-bold text-xl w-8 text-center text-blue-700">{quantity}</span>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-10 w-10 hover:bg-purple-200 text-purple-700 font-bold rounded-lg"
+                                <Minus className="h-4 w-4" />
+                            </button>
+                            <span className="w-8 text-center font-bold text-slate-900 text-sm">{quantity}</span>
+                            <button
                                 onClick={() => addToCart(product)}
+                                className="w-8 h-8 flex items-center justify-center rounded-full bg-brand-600 text-white shadow-md hover:bg-brand-700 transition-colors"
                             >
-                                <Plus className="h-5 w-5" />
-                            </Button>
+                                <Plus className="h-4 w-4" />
+                            </button>
                         </div>
                     )}
                 </div>
             </div>
-        </Card>
+        </div>
     );
 }
