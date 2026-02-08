@@ -1,306 +1,86 @@
-# Fixing Vercel 404 NOT_FOUND Error
+# Resolving Vercel "NOT_FOUND" (404) Deployment Error
 
-## 1. **The Fix: Update Vercel Project Settings**
+### 🔍 Diagnosis
+Based on your provided code and configuration:
+- **Framework:** Next.js 14.1.0 (`src/app` router)
+- **Configuration:** Standard `next.config.mjs` (default) and `package.json` scripts.
+- **Structure:** Code is at the project root (`src/` and `package.json` are top-level).
 
-### Step-by-Step Solution
-
-1. **Go to your Vercel dashboard**: https://vercel.com/dashboard
-2. **Select your project** (MANOMAY)
-3. **Click "Settings"** in the top navigation
-4. **Scroll to "Root Directory"** section
-5. **Leave it COMPLETELY EMPTY/BLANK** (this means the root, NOT `./` or `manomay-kiosk`)
-   - If there's any text in the field, delete it entirely
-   - An empty Root Directory = project root
-6. **Click "Save"**
-7. **Go to "Deployments"** tab
-8. **Click the three dots** on the latest deployment
-9. **Select "Redeploy"**
-
-### Alternative: Check Build Output Directory
-
-If the above doesn't work:
-1. In Settings → **Build & Development Settings**
-2. Verify:
-   - **Framework Preset:** Next.js (auto-detected)
-   - **Build Command:** `next build` or leave empty for default
-   - **Output Directory:** `.next` or leave empty for default
-   - **Install Command:** `npm install` or leave empty for default
+**The Verdict:** Your code is correct. The error is in the **Vercel Project Settings**.
 
 ---
 
-## 2. **Root Cause: Why This Error Occurred**
+## 1. The Fix: specific configuration change
 
-### What Was Happening vs. What Should Happen
+You have two options. **Option A** is the recommended permanent fix in the Vercel Dashboard. **Option B** is a code-based override.
 
-**The Sequence of Events:**
-1. You initially created the project in a subdirectory (`manomay-kiosk`)
-2. Files were later moved to the root directory
-3. Vercel **remembered the old configuration** from earlier deployments
-4. When you pushed new commits, Vercel successfully built the app
-5. **BUT** Vercel is still looking for pages in the old location
+### Option A: Fix Vercel Root Directory (Recommended)
+The 404 occurs because Vercel is looking for your built application in a subdirectory (or the wrong directory), while your code sits at the root.
 
-### What Triggered This Specific Error
+1. Go to **Vercel Dashboard** > **Select Project** > **Settings**.
+2. Find the **"Root Directory"** section.
+3. **Action:** Ensure this field is **COMPLETELY EMPTY**.
+   - If it says `./` or `manomay-kiosk` or anything else, **delete it**.
+4. Click **Save**.
+5. Go to **Deployments** tab > Click the three dots (⋮) on the latest build > **Redeploy**.
 
-The build succeeded, which means:
-- ✅ Vercel found `package.json`
-- ✅ Vercel ran `npm install`
-- ✅ Vercel ran `next build`
-- ✅ The build completed without errors
-
-**However**, when you try to access the URL:
-- ❌ Vercel's routing can't find the pages
-- ❌ Returns `404 NOT_FOUND`
-
-This happens because Vercel's **root directory setting** is pointing to the wrong place.
-
-### The Misconception
-
-Many developers think: *"If the build succeeds, the deployment should work."*
-
-**Reality:** A successful build means the code compiles. A working deployment means:
-1. Code compiles ✅
-2. **Pages are served from the correct location** ← This is where it failed
-3. All routes are accessible
-
----
-
-## 3. **The Underlying Concept: Vercel's Multi-Project Architecture**
-
-### Why Does This Error Exist?
-
-Vercel is designed to support **monorepos** (multiple projects in one repository). You might have:
-
-```
-my-repo/
-  ├── frontend/          ← Next.js app
-  ├── backend/           ← API server
-  ├── mobile-app/        ← React Native
-  └── package.json       ← Root config
-```
-
-To handle this, Vercel needs to know: **"Which folder contains the app I should deploy?"**
-
-This is the **Root Directory** setting.
-
-### The Correct Mental Model
-
-Think of Vercel deployment in two phases:
-
-**Phase 1: Build**
-- Vercel clones your repo
-- Navigates to the **Root Directory** you specified
-- Runs `npm install` and `next build` **in that directory**
-
-**Phase 2: Serve**
-- Vercel looks for the `.next` folder **in that same directory**
-- Sets up routing based on the `pages/` or `app/` folder
-
-If the Root Directory is wrong:
-- Build might still work (if `package.json` exists there)
-- **But serving fails** because the `.next` output is in a different location
-
-### How This Fits Into Vercel's Design
-
-Vercel separates concerns:
-- **GitHub Integration** → Watches for commits
-- **Build Phase** → Compiles your code
-- **Deploy Phase** → Serves the compiled output
-- **Routing Phase** → Maps URLs to pages
-
-The **Root Directory setting bridges** the Build and Deploy phases.
-
----
-
-## 4. **Warning Signs: Recognizing This Pattern**
-
-### What to Look Out For
-
-🚩 **Red Flags that indicate a Root Directory issue:**
-
-1. **Build succeeds but all pages return 404**
-   - Especially if even the home page (`/`) returns 404
-   
-2. **Deployment preview works but production doesn't** (or vice versa)
-   - Indicates different settings between preview/production
-   
-3. **You recently moved files** from a subdirectory to root (or vice versa)
-   - Vercel doesn't automatically detect this change
-   
-4. **Error ID changes but error type stays the same**
-   - `Code: NOT_FOUND` with different IDs means routing is consistently failing
-
-### Similar Mistakes in Related Scenarios
-
-This same pattern occurs when:
-
-**Scenario 1: Monorepo Confusion**
-```
-my-repo/
-  ├── apps/
-  │   └── web/          ← Next.js is here
-  └── package.json      ← But Vercel points to root
-```
-**Fix:** Set Root Directory to `apps/web`
-
-**Scenario 2: Framework Auto-Detection Fails**
-```
-my-repo/
-  ├── frontend/         ← Next.js
-  └── next.config.mjs   ← Config in root (wrong!)
-```
-**Fix:** Move `next.config.mjs` into `frontend/` OR set Root Directory to root
-
-**Scenario 3: Build Output Location Changed**
-You changed `next.config.mjs`:
-```javascript
-// Added this:
-output: 'export',
-distDir: 'dist',  // Changed from default '.next'
-```
-**Fix:** Update Vercel's Output Directory to `dist`
-
-### Code Smells
-
-🚩 **Project structure red flags:**
-- Multiple `package.json` files at different levels
-- Next.js config files in unexpected locations
-- `.next` folder in a different directory than your source files
-
----
-
-## 5. **Alternatives and Trade-offs**
-
-### Approach 1: Fix Vercel Settings (Recommended ✅)
-
-**What:** Update Root Directory to `./` in Vercel dashboard
-
-**Pros:**
-- No code changes needed
-- Keeps your project structure clean
-- Works immediately after redeployment
-
-**Cons:**
-- Requires manual dashboard access
-- Easy to forget when setting up new projects
-
----
-
-### Approach 2: Use `vercel.json` Configuration
-
-Create `vercel.json` in your root:
+### Option B: Force Config via `vercel.json` (Alternative)
+If you cannot access settings easily, create a `vercel.json` file in your root folder:
 
 ```json
 {
-  "buildCommand": "next build",
-  "devCommand": "next dev",
-  "installCommand": "npm install",
   "framework": "nextjs",
-  "outputDirectory": ".next"
+  "cleanUrls": true
 }
 ```
-
-**Pros:**
-- Configuration lives in code (version controlled)
-- Portable across Vercel projects
-- Team members get the same settings
-
-**Cons:**
-- Adds extra configuration file
-- Can conflict with Vercel dashboard settings
-- Overkill for simple projects
+*Note: This might not override a hard-set Root Directory in the dashboard, so Option A is safer.*
 
 ---
 
-### Approach 3: Restructure as Explicit Subdirectory
+## 2. Root Cause Analysis
 
-Move everything back to `manomay-kiosk/`:
+**Observation:** "My application builds, but the deployed URL returns a 404."
 
-```
-MANOMAY/
-  └── manomay-kiosk/
-      ├── src/
-      ├── package.json
-      └── next.config.mjs
-```
-
-Then set Root Directory to `manomay-kiosk`
-
-**Pros:**
-- Explicit structure
-- Good for monorepos
-- Clear separation if you add more projects later
-
-**Cons:**
-- Extra nesting
-- More typing in paths
-- Doesn't match typical Next.js conventions
+- **The Configuration:** Vercel was likely set up assuming your code was in a subdirectory (e.g., if you uploaded a folder containing the project folder).
+- **The Conflict:**
+  1. **Build Phase:** Vercel found `package.json` and ran `next build`. Next.js successfully created the `.next` folder.
+  2. **Serving Phase:** Vercel's Edge Network looked for the **Entry Point** (the Output Directory). Because the "Root Directory" setting was misaligned, it looked in the wrong place for the `.next` folder or static assets.
+  3. **Result:** It found nothing matching `/`, so it returned `404 NOT_FOUND`.
 
 ---
 
-### Approach 4: Use Vercel CLI for Deployment
+## 3. The Concept: Build vs. Serve
 
-Instead of GitHub integration:
+To understand `NOT_FOUND` on a successful build, you must distinguish between **Building** and **Serving**.
 
-```bash
-npm install -g vercel
-cd c:/Users/Chaitya/OneDrive/Desktop/MANOMAY
-vercel --prod
-```
+| Concept | What it does | Where it fails here |
+| :--- | :--- | :--- |
+| **Build** | Converts `src/app/page.tsx` → `.next/server/app/page.html` | ✅ Works! Code is valid. |
+| **Serve** | Maps URL `your-site.com/` → `.next/server/app/page.html` | ❌ Fails! Router is looking in wrong path. |
 
-**Pros:**
-- Manual control over deployments
-- Can specify settings per deployment
-- Good for testing
+**Mental Model:**
+Imagine you baked a cake in the **Kitchen** (Build), but the Waiter (Server) is looking for it in the **Garage**. The cake exists, but the customer (User) gets a "404 Not Found" because the Waiter assumes instructions meant "Garage".
 
-**Cons:**
-- Loses automatic deployment on push
-- Requires local Vercel CLI
-- More manual work
+**Standard Entry Points:**
+- **Next.js App Router:** The entry is dynamic. Vercel expects a specific `.next` folder structure.
+- **Static HTML:** Expects `index.html`.
+*Your app is Next.js, so it relies on the `.next` folder being exactly where Vercel expects it relative to the Root Directory.*
 
 ---
 
-## Best Practice Recommendation
+## 4. Warning Signs & Code Smells
 
-**For your current situation:**
+Check these if the issue persists:
 
-1. **Fix the Vercel dashboard settings** (Approach 1)
-   - Fastest solution
-   - No code changes
-   
-2. **Keep project in root directory**
-   - Follows Next.js conventions
-   - Simpler structure
-   
-3. **Consider adding `vercel.json` later** if you:
-   - Work in a team
-   - Deploy multiple similar projects
-   - Want version-controlled deploy settings
+1.  **Nested Folders:**
+    - *Bad:* `repo-root/my-app/package.json` (when Vercel Root is `repo-root`).
+    - *Fix:* Set Vercel Root to `my-app`.
+2.  **Output Export:**
+    - If `next.config.mjs` has `output: 'export'`, it produces an `out` folder. Vercel usually auto-detects this, but if manually configured to `.next`, it fails. (Your config is standard, so this is unlikely).
+3.  **Middleware:**
+    - Does `middleware.ts` exist? If it redirects incorrectly, it causes 404s. (You don't have one visible in root).
+4.  **Case Sensitivity:**
+    - `Imports` matching file names exactly (`Header.tsx` vs `header.tsx`). Windows is case-insensitive, Linux (Vercel) is not.
 
----
-
-## Quick Checklist
-
-Before redeploying, verify:
-
-- [ ] Root Directory is **completely empty/blank** (empty field = root directory)
-- [ ] Framework Preset shows "Next.js"
-- [ ] `src/app/page.tsx` exists in your root
-- [ ] `package.json` is in the root
-- [ ] `next.config.mjs` is in the root
-- [ ] No `.vercelignore` file excluding important files
-
-After making changes:
-- [ ] Redeploy from Vercel dashboard
-- [ ] Wait for build to complete
-- [ ] Test your deployment URL
-- [ ] Verify all routes work (`/`, `/menu`, `/cart`, `/checkout`)
-
----
-
-## Summary
-
-**The Problem:** Vercel built successfully but serves 404s because it's looking for pages in the wrong directory.
-
-**The Solution:** Update Vercel's "Root Directory" setting to `./` (root) and redeploy.
-
-**Key Insight:** A successful build ≠ a working deployment. Vercel needs to know where to find your built pages.
+## 5. Summary
+Your code is production-ready. Valid structure, valid config. This is purely a "wiring" issue in the Vercel Dashboard. **Clear the Root Directory setting and redeploy.**
