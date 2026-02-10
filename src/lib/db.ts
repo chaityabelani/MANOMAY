@@ -2,12 +2,6 @@ import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-    throw new Error(
-        'Please define the MONGODB_URI environment variable inside .env.local'
-    );
-}
-
 /**
  * Global caching interface to prevent multiple connections
  * during hot-reload in development and serverless invocations.
@@ -35,6 +29,13 @@ if (!cached) {
 }
 
 async function dbConnect(): Promise<mongoose.Connection> {
+    // 1. Check for Env Var inside the function (Build-time safe)
+    if (!MONGODB_URI) {
+        throw new Error(
+            'Please define the MONGODB_URI environment variable inside .env.local'
+        );
+    }
+
     if (cached.conn) {
         return cached.conn;
     }
@@ -42,12 +43,9 @@ async function dbConnect(): Promise<mongoose.Connection> {
     if (!cached.promise) {
         const opts = {
             bufferCommands: false,
-            // The following options are no longer required in Mongoose 6+ but kept for clarity if using older versions
-            // useNewUrlParser: true,
-            // useUnifiedTopology: true,
         };
 
-        cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
+        cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
             console.log('✅ New MongoDB Connection Established');
             return mongoose.connection;
         });
