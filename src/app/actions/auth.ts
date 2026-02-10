@@ -1,0 +1,117 @@
+'use server';
+
+import { z } from 'zod';
+import { cookies } from 'next/headers';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import dbConnect from '@/lib/db';
+import User from '@/models/User';
+
+// --- Validation Schemas ---
+
+const SignupSchema = z.object({
+    name: z.string().min(2, 'Name must be at least 2 characters'),
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+const LoginSchema = z.object({
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(1, 'Password is required'),
+});
+
+// --- Actions ---
+
+export async function signupAction(prevState: any, formData: FormData) {
+    try {
+        const rawData = Object.fromEntries(formData.entries());
+        const result = SignupSchema.safeParse(rawData);
+
+        if (!result.success) {
+            return { success: false, errors: result.error.flatten().fieldErrors };
+        }
+
+        const { name, email, password } = result.data;
+
+        await dbConnect();
+
+        // Check if user exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return { success: false, message: 'User with this email already exists' };
+        }
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create user
+        const newUser = await User.create({
+            name,
+            email,
+            password: hashedPassword,
+            role: 'user', // Default role
+        });
+
+        // Automatically log in the user (set cookie)
+        await createSession(newUser);
+
+        return { success: true, message: 'Account created successfully!' };
+    } catch (error) {
+        console.error('Signup Error:', error);
+        return { success: false, message: 'Internal server error' };
+    }
+}
+
+export async function loginAction(prevState: any, formData: FormData) {
+    try {
+        const rawData = Object.fromEntries(formData.entries());
+        const result = LoginSchema.safeParse(rawData);
+
+        if (!result.success) {
+            return { success: false, errors: result.error.flatten().fieldErrors };
+        }
+
+        const { email, password } = result.data;
+
+        await dbConnect();
+
+        const user = await User.findOne({ email }).select('+password');
+
+        if (!user) {
+            return { success: false, message: 'Invalid credentials' };
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password!);
+
+        if (!isMatch) {
+            return { success: false, message: 'Invalid credentials' };
+        }
+
+        await createSession(user);
+
+        return { success: true, message: 'Login successful!' };
+    } catch (error) {
+        console.error('Login Error:', error);
+        return { success: false, message: 'Internal server error' };
+    }
+}
+
+// --- Helper Functions ---
+
+async function createSession(user: any) {
+    const secret = process.env.JWT_SECRET || 'fallback_secret_dev_only';
+
+    const token = jwt.sign(
+        { userId: user._id, role: user.role, email: user.email },
+        secret,
+        { expiresIn: '1d' }
+    );
+
+    cookies().set('auth_token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 24, // 1 day
+        path: '/',
+    });
+}
