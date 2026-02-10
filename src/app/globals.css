@@ -52,7 +52,7 @@
 
 @layer base {
     * {
-        @apply border-slate-200;
+        @apply border-border;
     }
 
     body {
