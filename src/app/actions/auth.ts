@@ -99,13 +99,22 @@ export async function loginAction(prevState: any, formData: FormData) {
 // --- Helper Functions ---
 
 async function createSession(user: any) {
-    const secret = process.env.JWT_SECRET || 'fallback_secret_dev_only';
+    const secret = process.env.JWT_SECRET;
+
+    if (!secret) {
+        if (process.env.NODE_ENV === 'production') {
+            throw new Error('JWT_SECRET is not defined in environment variables.');
+        }
+        console.warn('WARNING: Using fallback JWT secret. Do not use this in production!');
+    }
 
     const token = jwt.sign(
         { userId: user._id, role: user.role, email: user.email },
-        secret,
+        secret || 'fallback_secret_dev_only',
         { expiresIn: '1d' }
     );
+
+
 
     cookies().set('auth_token', token, {
         httpOnly: true,

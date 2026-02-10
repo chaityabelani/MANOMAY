@@ -55,10 +55,18 @@ export async function POST(req: Request) {
         }
 
         // 5. Generate JWT
-        const secret = process.env.JWT_SECRET || 'fallback_secret_dev_only';
+        const secret = process.env.JWT_SECRET;
+
+        if (!secret) {
+            if (process.env.NODE_ENV === 'production') {
+                throw new Error('JWT_SECRET is not defined in environment variables.');
+            }
+            console.warn('WARNING: Using fallback JWT secret. Do not use this in production!');
+        }
+
         const token = jwt.sign(
             { userId: user._id, role: user.role, email: user.email },
-            secret,
+            secret || 'fallback_secret_dev_only',
             { expiresIn: '1d' }
         );
 
