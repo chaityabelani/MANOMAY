@@ -123,22 +123,7 @@ export default function LoginPage() {
                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                     ></path>
                                 </svg>
-                            ) : (
-                                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                                    <svg
-                                        className="h-5 w-5 text-orange-500 group-hover:text-orange-400"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                        aria-hidden="true"
-                                    >
-                                        <path
-                                            fillRule="evenodd"
-                                            d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z"
-                                            clipRule="evenodd"
-                                        />
-                                    </svg>
-                                </span>
-                            )}
+                            ) : null}
                             {loading ? 'Signing in...' : 'Sign in'}
                         </button>
                     </div>

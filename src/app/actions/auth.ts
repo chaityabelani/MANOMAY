@@ -152,3 +152,28 @@ async function createSession(user: any) {
         path: '/',
     });
 }
+
+export async function getSession() {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('auth_token')?.value;
+
+    if (!token) {
+        return null;
+    }
+
+    try {
+        const secret = process.env.JWT_SECRET || 'fallback_secret_dev_only';
+        const decoded = jwt.verify(token, secret) as { userId: string; role: string; email: string };
+
+        return {
+            user: {
+                _id: decoded.userId,
+                email: decoded.email,
+                role: decoded.role,
+            }
+        };
+    } catch (error) {
+        console.error('Session Error:', error);
+        return null;
+    }
+}
