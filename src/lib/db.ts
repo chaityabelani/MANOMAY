@@ -29,10 +29,13 @@ if (!cached) {
 }
 
 async function dbConnect(): Promise<mongoose.Connection> {
-    // 1. Check for Env Var inside the function (Build-time safe)
+    // 1. Check for Env Var inside the function (Runtime safe)
     if (!MONGODB_URI) {
+        // Instead of crashing, we log a critical error and throw a descriptive one
+        // that can be caught by the API route/Action.
+        console.error("❌ CRITICAL: MONGODB_URI is not defined.");
         throw new Error(
-            'Please define the MONGODB_URI environment variable inside .env.local'
+            'Database configuration error: MONGODB_URI is missing. Please check your .env.local or Vercel Environment Variables.'
         );
     }
 
@@ -55,6 +58,7 @@ async function dbConnect(): Promise<mongoose.Connection> {
         cached.conn = await cached.promise;
     } catch (e) {
         cached.promise = null;
+        console.error("❌ MongoDB Connection Error:", e);
         throw e;
     }
 

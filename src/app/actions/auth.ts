@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
+import { validateEnv } from '@/lib/env';
 
 // --- Validation Schemas ---
 
@@ -24,6 +25,16 @@ const LoginSchema = z.object({
 
 export async function signupAction(prevState: any, formData: FormData) {
     try {
+        // 1. Validate Environment (Graceful Failure)
+        const envCheck = validateEnv();
+        if (!envCheck.success) {
+            console.error("❌ Signup Blocked: Missing Environment Variables");
+            return {
+                success: false,
+                message: 'System configuration error. Please contact the administrator.'
+            };
+        }
+
         const rawData = Object.fromEntries(formData.entries());
         const result = SignupSchema.safeParse(rawData);
 
@@ -56,14 +67,28 @@ export async function signupAction(prevState: any, formData: FormData) {
         await createSession(newUser);
 
         return { success: true, message: 'Account created successfully!' };
-    } catch (error) {
+    } catch (error: any) {
         console.error('Signup Error:', error);
-        return { success: false, message: 'Internal server error' };
+        // Return a generic error message to the client, but log the specific error on the server
+        return {
+            success: false,
+            message: 'Internal server error. Please try again later.'
+        };
     }
 }
 
 export async function loginAction(prevState: any, formData: FormData) {
     try {
+        // 1. Validate Environment (Graceful Failure)
+        const envCheck = validateEnv();
+        if (!envCheck.success) {
+            console.error("❌ Login Blocked: Missing Environment Variables");
+            return {
+                success: false,
+                message: 'System configuration error. Please contact the administrator.'
+            };
+        }
+
         const rawData = Object.fromEntries(formData.entries());
         const result = LoginSchema.safeParse(rawData);
 
@@ -90,9 +115,12 @@ export async function loginAction(prevState: any, formData: FormData) {
         await createSession(user);
 
         return { success: true, message: 'Login successful!' };
-    } catch (error) {
+    } catch (error: any) {
         console.error('Login Error:', error);
-        return { success: false, message: 'Internal server error' };
+        return {
+            success: false,
+            message: 'Internal server error. Please try again later.'
+        };
     }
 }
 
