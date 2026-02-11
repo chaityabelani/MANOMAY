@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react';
-import { useFormStatus } from 'react-dom';
-import { registerShop } from '@/app/actions/vendor'; // We'll hook this up
-import { Input } from "@/components/ui/input" // Assuming specific components if we had them, OR use raw HTML
-// Since we don't have components setup, I'll use raw Tailwind form
+import { useFormStatus, useFormState } from 'react-dom';
+import { registerShop } from '@/app/actions/vendor';
+
+const initialState = {
+    error: '',
+};
 
 function SubmitButton() {
     const { pending } = useFormStatus();
@@ -20,9 +22,7 @@ function SubmitButton() {
 }
 
 export default function VendorRegisterPage() {
-    // using raw form action for now, or useActionState in React 19/Next 14+
-    // But sticking to simple form action to avoid hydration mismatch if not set up perfect
-    // Actually, `useFormState` is safer. Let's try basic form action first.
+    const [state, formAction] = useFormState(registerShop, initialState);
 
     return (
         <div className="min-h-screen bg-neutral-50 flex flex-col items-center justify-center p-4">
@@ -32,7 +32,13 @@ export default function VendorRegisterPage() {
                     <p className="text-neutral-500">Join Manomay Food Park and start selling.</p>
                 </div>
 
-                <form action={registerShop} className="space-y-6">
+                {state?.error && (
+                    <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-lg text-sm">
+                        {state.error}
+                    </div>
+                )}
+
+                <form action={formAction} className="space-y-6">
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-neutral-700 mb-1">Shop Name</label>
                         <input

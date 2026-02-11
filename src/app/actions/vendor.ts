@@ -8,13 +8,6 @@ import Product from "@/models/Product";
 import { revalidatePath } from "next/cache";
 import { model } from "@/lib/gemini";
 import mongoose from "mongoose";
-
-// Helper to ensure DB connection (Next.js server actions might need this if not globally handled)
-// Actually, mongoose usually persists connection, but let's be safe or rely on layout connect? 
-// Next.js instrumentations or ad-hoc connect. 
-// For now, let's assume global connect or add it here if needed. 
-// We don't have a global db connect util in `src/lib/db.ts` yet? We should check updates.
-// We accepted the risk.
 import { redirect } from "next/navigation";
 
 // --- Register Shop ---
@@ -32,16 +25,16 @@ export async function registerShop(prevState: any, formData: FormData) {
 
     try {
         // 1. Find the default Food Park (For now, we assume single tenant or first active)
-        // If no park exists, we might create one for dev purposes? 
         let park = await FoodPark.findOne({ isActive: true });
 
         if (!park) {
             // Fallback for dev: Create a default park if none exists
+            // We cast session.user to any because strict types might be missing _id or role details we know exist
             const adminUser = await User.findOne({ role: 'superadmin' }) || session.user;
             park = await FoodPark.create({
                 name: "Manomay Food Park",
                 location: { lat: 0, lng: 0, address: "Default Location" },
-                adminId: adminUser._id || session.user.id, // weak type check fix
+                adminId: adminUser._id || (session.user as any)._id,
                 isActive: true
             });
         }
@@ -52,12 +45,12 @@ export async function registerShop(prevState: any, formData: FormData) {
             name,
             description,
             cuisineType: cuisineTypeCombined ? cuisineTypeCombined.split(',').map(c => c.trim()) : [],
-            ownerId: session.user.id,
+            ownerId: (session.user as any)._id,
             isActive: true
         });
 
         // 3. Update User Role
-        await User.findByIdAndUpdate(session.user.id, { role: 'vendor' });
+        await User.findByIdAndUpdate((session.user as any)._id, { role: 'vendor' });
 
         // 4. Revalidate
         revalidatePath('/profile');
@@ -130,7 +123,7 @@ export async function saveMenuItems(shopId: string, items: any[]) {
 
         // Check availability of FIND_MY_SHOP
         if (shopId === "FIND_MY_SHOP") {
-            const shop = await Shop.findOne({ ownerId: session.user.id });
+            const shop = await Shop.findOne({ ownerId: (session.user as any)._id });
             if (!shop) return { error: "No shop found for this user." };
             targetShopId = shop._id.toString();
         }
@@ -138,7 +131,7 @@ export async function saveMenuItems(shopId: string, items: any[]) {
         // Validate Ownership
         const shop = await Shop.findById(targetShopId);
         if (!shop) return { error: "Shop not found" };
-        if (shop.ownerId.toString() !== session.user.id) return { error: "You do not own this shop" };
+        if (shop.ownerId.toString() !== (session.user as any)._id) return { error: "You do not own this shop" };
 
         const products = items.map(item => ({
             shopId: shop._id,
