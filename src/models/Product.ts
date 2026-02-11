@@ -1,11 +1,13 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IProduct extends Document {
+    shopId: mongoose.Types.ObjectId;
     name: string;
     description: string;
     price: number;
     category: string; // e.g., 'Starter', 'Main Course', 'Dessert'
     image?: string;
+    embedding?: number[]; // Vector embedding for AI search
     isAvailable: boolean;
     createdAt: Date;
     updatedAt: Date;
@@ -13,6 +15,12 @@ export interface IProduct extends Document {
 
 const ProductSchema: Schema<IProduct> = new Schema(
     {
+        shopId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Shop',
+            required: true,
+            index: true,
+        },
         name: {
             type: String,
             required: [true, 'Please provide a name for this product.'],
@@ -32,6 +40,10 @@ const ProductSchema: Schema<IProduct> = new Schema(
         },
         image: {
             type: String,
+        },
+        embedding: {
+            type: [Number], // For vector search
+            select: false, // Hide by default to save bandwidth
         },
         isAvailable: {
             type: Boolean,
