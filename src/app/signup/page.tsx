@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { signupAction } from '@/app/actions/auth';
+import { Lock, Mail, User, ArrowRight, AlertCircle, Sparkles } from 'lucide-react';
 
 export default function SignupPage() {
     const router = useRouter();
@@ -21,7 +22,7 @@ export default function SignupPage() {
         const result = await signupAction(null, formData);
 
         if (result.success) {
-            router.push('/'); // Redirect to home/dashboard
+            router.push('/');
             router.refresh();
         } else {
             if (result.errors) {
@@ -35,92 +36,148 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-            <div className="w-full max-w-md space-y-8">
-                <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 font-display">
-                        Create your account
-                    </h2>
-                    <p className="mt-2 text-center text-sm text-gray-600">
-                        Already have an account?{' '}
-                        <Link href="/login" className="font-medium text-orange-600 hover:text-orange-500">
-                            Sign in
-                        </Link>
-                    </p>
-                </div>
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    <div className="-space-y-px rounded-md shadow-sm">
-                        <div>
-                            <label htmlFor="name" className="sr-only">
-                                Full Name
-                            </label>
-                            <input
-                                id="name"
-                                name="name"
-                                type="text"
-                                required
-                                className="relative block w-full rounded-t-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6 px-3"
-                                placeholder="Full Name"
-                            />
-                            {fieldErrors.name && (
-                                <p className="text-xs text-red-600 mt-1 px-1">{fieldErrors.name[0]}</p>
-                            )}
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 p-4">
+            {/* Animated Background Circles */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute bottom-1/3 left-1/4 w-96 h-96 bg-purple-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+            </div>
+
+            {/* Signup Card */}
+            <div className="relative w-full max-w-md">
+                {/* Glass Card */}
+                <div className="glass-pro rounded-3xl shadow-2xl p-8 backdrop-blur-xl border border-white/30">
+                    {/* Logo/Brand */}
+                    <div className="text-center mb-8">
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-4">
+                            <Sparkles className="w-8 h-8 text-white" />
                         </div>
-                        <div>
-                            <label htmlFor="email" className="sr-only">
-                                Email address
-                            </label>
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                autoComplete="email"
-                                required
-                                className="relative block w-full border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6 px-3"
-                                placeholder="Email address"
-                            />
-                            {fieldErrors.email && (
-                                <p className="text-xs text-red-600 mt-1 px-1">{fieldErrors.email[0]}</p>
-                            )}
-                        </div>
-                        <div>
-                            <label htmlFor="password" className="sr-only">
-                                Password
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                required
-                                className="relative block w-full rounded-b-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6 px-3"
-                                placeholder="Password (min 6 chars)"
-                            />
-                            {fieldErrors.password && (
-                                <p className="text-xs text-red-600 mt-1 px-1">{fieldErrors.password[0]}</p>
-                            )}
-                        </div>
+                        <h1 className="text-4xl font-display font-bold text-white mb-2">
+                            Join Manomay
+                        </h1>
+                        <p className="text-white/80 text-sm">
+                            Create your Food Park account
+                        </p>
                     </div>
 
+                    {/* Error Alert */}
                     {error && (
-                        <div className="rounded-md bg-red-50 p-4">
-                            <div className="flex">
-                                <div className="ml-3">
-                                    <h3 className="text-sm font-medium text-red-800">{error}</h3>
-                                </div>
-                            </div>
+                        <div className="mb-6 p-4 bg-red-500/20 border border-red-300/40 rounded-xl flex items-start gap-3">
+                            <AlertCircle className="w-5 h-5 text-red-100 flex-shrink-0 mt-0.5" />
+                            <p className="text-red-100 text-sm">{error}</p>
                         </div>
                     )}
 
-                    <div>
+                    {/* Signup Form */}
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        {/* Name Input */}
+                        <div>
+                            <label htmlFor="name" className="block text-white/90 text-sm font-medium mb-2">
+                                Full Name
+                            </label>
+                            <div className="relative">
+                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+                                <input
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    required
+                                    className="w-full pl-12 pr-4 py-3.5 bg-white/20 border border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all"
+                                    placeholder="John Doe"
+                                />
+                            </div>
+                            {fieldErrors.name && (
+                                <p className="text-xs text-red-200 mt-2 ml-1">{fieldErrors.name[0]}</p>
+                            )}
+                        </div>
+
+                        {/* Email Input */}
+                        <div>
+                            <label htmlFor="email" className="block text-white/90 text-sm font-medium mb-2">
+                                Email Address
+                            </label>
+                            <div className="relative">
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    autoComplete="email"
+                                    required
+                                    className="w-full pl-12 pr-4 py-3.5 bg-white/20 border border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all"
+                                    placeholder="you@example.com"
+                                />
+                            </div>
+                            {fieldErrors.email && (
+                                <p className="text-xs text-red-200 mt-2 ml-1">{fieldErrors.email[0]}</p>
+                            )}
+                        </div>
+
+                        {/* Password Input */}
+                        <div>
+                            <label htmlFor="password" className="block text-white/90 text-sm font-medium mb-2">
+                                Password
+                            </label>
+                            <div className="relative">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    required
+                                    className="w-full pl-12 pr-4 py-3.5 bg-white/20 border border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all"
+                                    placeholder="Minimum 6 characters"
+                                />
+                            </div>
+                            {fieldErrors.password && (
+                                <p className="text-xs text-red-200 mt-2 ml-1">{fieldErrors.password[0]}</p>
+                            )}
+                        </div>
+
+                        {/* Submit Button */}
                         <button
                             type="submit"
                             disabled={loading}
-                            className="group relative flex w-full justify-center rounded-md bg-orange-600 px-3 py-2 text-sm font-semibold text-white hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:opacity-70 disabled:cursor-not-allowed"
+                            className="w-full mt-6 bg-white hover:bg-white/90 text-purple-600 font-bold py-3.5 px-6 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
                         >
-                            {loading ? 'Creating Account...' : 'Sign Up'}
+                            {loading ? (
+                                <>
+                                    <div className="w-5 h-5 border-2 border-purple-600/30 border-t-purple-600 rounded-full animate-spin"></div>
+                                    <span>Creating Account...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span>Create Account</span>
+                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                </>
+                            )}
                         </button>
+                    </form>
+
+                    {/* Divider */}
+                    <div className="relative my-6">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-white/20"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-4 bg-transparent text-white/70">or</span>
+                        </div>
                     </div>
-                </form>
+
+                    {/* Login Link */}
+                    <p className="text-center text-white/80 text-sm">
+                        Already have an account?{' '}
+                        <Link
+                            href="/login"
+                            className="font-semibold text-white hover:underline transition-all"
+                        >
+                            Sign In
+                        </Link>
+                    </p>
+                </div>
+
+                {/* Decorative Element */}
+                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-3/4 h-6 bg-gradient-to-b from-black/20 to-transparent blur-xl rounded-full"></div>
             </div>
         </div>
     );
