@@ -7,7 +7,15 @@ import { useCartStore } from "@/store/useCartStore";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
-export function Header() {
+export interface HeaderProps {
+    user: {
+        _id: string;
+        email: string;
+        role: string;
+    } | null;
+}
+
+export function Header({ user }: HeaderProps) {
     const pathname = usePathname();
     const { getTotalItems } = useCartStore();
     const itemCount = getTotalItems();
@@ -47,18 +55,32 @@ export function Header() {
                     </nav>
 
                     {/* Cart/User Icon Circle */}
-                    <Link href="/login">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-10 w-10 rounded-full bg-slate-100 hover:bg-brand-100 hover:text-brand-600 ml-1"
-                            title="Sign In"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                            </svg>
-                        </Button>
-                    </Link>
+                    {user ? (
+                        <Link href="/profile" title="My Profile">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-10 w-10 rounded-full bg-slate-100 hover:bg-brand-100 hover:text-brand-600 ml-1 border border-brand-200"
+                            >
+                                <span className="font-bold text-brand-700">
+                                    {user.email.charAt(0).toUpperCase()}
+                                </span>
+                            </Button>
+                        </Link>
+                    ) : (
+                        <Link href="/login">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-10 w-10 rounded-full bg-slate-100 hover:bg-brand-100 hover:text-brand-600 ml-1"
+                                title="Sign In"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                </svg>
+                            </Button>
+                        </Link>
+                    )}
 
                     <Link href="/cart">
                         <Button
