@@ -98,12 +98,24 @@ export default function VendorDashboardPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 p-8">
             <div className="max-w-6xl mx-auto">
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                    Vendor Dashboard
-                </h1>
-                <p className="text-gray-600 mb-8">
-                    Upload your menu photo and let AI extract the items
-                </p>
+                {/* Header with Profile */}
+                <div className="flex justify-between items-start mb-8">
+                    <div>
+                        <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                            Vendor Dashboard
+                        </h1>
+                        <p className="text-gray-600">
+                            Upload your menu photo and let AI extract the items
+                        </p>
+                    </div>
+
+                    {/* Profile Dropdown */}
+                    <ProfileDropdown
+                        userName="Vendor User"
+                        userEmail="vendor@example.com"
+                        userRole="vendor"
+                    />
+                </div>
 
                 {/* Shop Selector */}
                 {shops.length > 0 && (

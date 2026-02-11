@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { getMenuByPark } from '@/app/actions/park';
+import { getSession } from '@/app/actions/auth';
 import { ShoppingCart, Plus, Minus, ChefHat, Loader2 } from 'lucide-react';
 import { useParams } from 'next/navigation';
+import ProfileDropdown from '@/components/ProfileDropdown';
 
 interface Product {
     id: string;
@@ -146,8 +148,8 @@ export default function MenuPage() {
                                 key={shop.id}
                                 onClick={() => setSelectedShopId(shop.id)}
                                 className={`flex items-center gap-2 px-6 py-3 rounded-lg whitespace-nowrap transition-all ${selectedShop === shop.id
-                                        ? 'bg-brand-600 text-white shadow-lg'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    ? 'bg-brand-600 text-white shadow-lg'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                     }`}
                             >
                                 <ChefHat className="w-5 h-5" />
