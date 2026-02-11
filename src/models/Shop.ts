@@ -7,6 +7,7 @@ export interface IShop extends Document {
     cuisineType: string[];
     ownerId: mongoose.Types.ObjectId; // Reference to the Vendor User
     image?: string;
+    logo?: string;
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
@@ -35,6 +36,7 @@ const ShopSchema: Schema<IShop> = new Schema(
             required: true,
         },
         image: String,
+        logo: String,
         isActive: {
             type: Boolean,
             default: true,
