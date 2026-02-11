@@ -1,9 +1,10 @@
 'use server';
 
 import { model } from '@/lib/gemini';
-import { writeFile, unlink } from 'fs/promises';
-import { join } from 'path';
 import { getSession } from './auth';
+import Product from '@/models/Product';
+import Shop from '@/models/Shop';
+import connectDB from '@/lib/db';
 
 export interface ParsedMenuItem {
     name: string;
@@ -85,22 +86,37 @@ Example output:
     }
 }
 
-export async function saveMenuItems(
-    shopId: string,
-    items: ParsedMenuItem[]
-) {
+export async function saveMenuItems(shopId: string, items: ParsedMenuItem[]) {
     try {
         const session = await getSession();
         if (!session?.user) {
             return { success: false, error: 'Unauthorized' };
         }
 
-        // TODO: Import Product model and save items to database
-        // This will be implemented after we create the products
+        await connectDB();
+
+        // Verify shop exists
+        const shop = await Shop.findById(shopId);
+        if (!shop) {
+            return { success: false, error: 'Shop not found' };
+        }
+
+        // Create products in database
+        const createdProducts = await Product.insertMany(
+            items.map((item) => ({
+                shopId,
+                name: item.name,
+                description: item.description,
+                price: item.price,
+                category: item.category,
+                isAvailable: true,
+            }))
+        );
 
         return {
             success: true,
-            message: `${items.length} items will be saved (database save pending)`,
+            message: `Successfully saved ${createdProducts.length} items`,
+            count: createdProducts.length,
         };
     } catch (error: any) {
         console.error('Save menu items error:', error);

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { parseMenuImage, ParsedMenuItem } from '@/app/actions/menu';
+import { useState, useEffect } from 'react';
+import { parseMenuImage, ParsedMenuItem, saveMenuItems } from '@/app/actions/menu';
+import { getVendorShops } from '@/app/actions/shop';
 import { Upload, Loader2, CheckCircle, XCircle } from 'lucide-react';
 
 export default function VendorDashboardPage() {
@@ -11,6 +12,23 @@ export default function VendorDashboardPage() {
     const [parsedItems, setParsedItems] = useState<ParsedMenuItem[]>([]);
     const [error, setError] = useState<string>('');
     const [success, setSuccess] = useState<string>('');
+    const [shops, setShops] = useState<any[]>([]);
+    const [selectedShopId, setSelectedShopId] = useState<string>('');
+    const [saving, setSaving] = useState(false);
+
+    // Fetch vendor's shops on mount
+    useEffect(() => {
+        async function loadShops() {
+            const result = await getVendorShops();
+            if (result.success && result.shops) {
+                setShops(result.shops);
+                if (result.shops.length > 0) {
+                    setSelectedShopId(result.shops[0].id);
+                }
+            }
+        }
+        loadShops();
+    }, []);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -49,6 +67,33 @@ export default function VendorDashboardPage() {
         }
     };
 
+    const handleSaveItems = async () => {
+        if (!selectedShopId) {
+            setError('Please select a shop first');
+            return;
+        }
+
+        setSaving(true);
+        setError('');
+
+        try {
+            const result = await saveMenuItems(selectedShopId, parsedItems);
+
+            if (result.success) {
+                setSuccess(`✅ ${result.message}`);
+                setParsedItems([]);
+                setSelectedFile(null);
+                setPreview(null);
+            } else {
+                setError(result.error || 'Failed to save items');
+            }
+        } catch (err: any) {
+            setError(err.message || 'An error occurred');
+        } finally {
+            setSaving(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 p-8">
             <div className="max-w-6xl mx-auto">
@@ -58,6 +103,27 @@ export default function VendorDashboardPage() {
                 <p className="text-gray-600 mb-8">
                     Upload your menu photo and let AI extract the items
                 </p>
+
+                {/* Shop Selector */}
+                {shops.length > 0 && (
+                    <div className="mb-6 bg-white rounded-xl shadow-lg p-4">
+                        <label htmlFor="shop-select" className="block text-sm font-medium text-gray-700 mb-2">
+                            Select Your Shop
+                        </label>
+                        <select
+                            id="shop-select"
+                            value={selectedShopId}
+                            onChange={(e) => setSelectedShopId(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                        >
+                            {shops.map((shop) => (
+                                <option key={shop.id} value={shop.id}>
+                                    {shop.name} {shop.cuisineType.length > 0 && `(${shop.cuisineType.join(', ')})`}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Upload Section */}
@@ -170,11 +236,21 @@ export default function VendorDashboardPage() {
 
                         {parsedItems.length > 0 && (
                             <button
-                                className="w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
-                                onClick={() => alert('Save to database feature coming next!')}
+                                className="w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                onClick={handleSaveItems}
+                                disabled={saving || !selectedShopId}
                             >
-                                <CheckCircle className="w-5 h-5" />
-                                Save {parsedItems.length} Items to Database
+                                {saving ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        Saving...
+                                    </>
+                                ) : (
+                                    <>
+                                        <CheckCircle className="w-5 h-5" />
+                                        Save {parsedItems.length} Items to Database
+                                    </>
+                                )}
                             </button>
                         )}
                     </div>
