@@ -1,5 +1,5 @@
 
-import { model, fileToGenerativePart } from "./src/lib/gemini";
+import { model, fileToGenerativePart } from "../src/lib/gemini";
 import fs from "fs";
 import path from "path";
 

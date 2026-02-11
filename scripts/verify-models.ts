@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
-import FoodPark from './src/models/FoodPark.ts';
-import Shop from './src/models/Shop.ts';
-import Product from './src/models/Product.ts';
-import User from './src/models/User.ts';
-import TableSession from './src/models/TableSession.ts';
-import Order from './src/models/Order.ts';
+import FoodPark from '../src/models/FoodPark.ts';
+import Shop from '../src/models/Shop.ts';
+import Product from '../src/models/Product.ts';
+import User from '../src/models/User.ts';
+import TableSession from '../src/models/TableSession.ts';
+import Order from '../src/models/Order.ts';
 
 console.log('Verifying Models...');
 
