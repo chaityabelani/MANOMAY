@@ -35,6 +35,16 @@ export default function MenuPage() {
     const [selectedShop, setSelectedShopId] = useState<string | null>(null);
     const [cart, setCart] = useState<Record<string, number>>({});
     const [error, setError] = useState<string>('');
+    const [session, setSession] = useState<any>(null);
+
+    // Fetch session
+    useEffect(() => {
+        async function loadSession() {
+            const sessionData = await getSession();
+            setSession(sessionData);
+        }
+        loadSession();
+    }, []);
 
     useEffect(() => {
         async function loadMenu() {
@@ -127,14 +137,27 @@ export default function MenuPage() {
                                 <p className="text-sm text-gray-600">{parkData.location.address}</p>
                             )}
                         </div>
-                        {getCartCount() > 0 && (
-                            <div className="relative">
-                                <ShoppingCart className="w-8 h-8 text-brand-600" />
-                                <span className="absolute -top-2 -right-2 bg-brand-600 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
-                                    {getCartCount()}
-                                </span>
-                            </div>
-                        )}
+
+                        <div className="flex items-center gap-4">
+                            {/* Cart Icon */}
+                            {getCartCount() > 0 && (
+                                <div className="relative">
+                                    <ShoppingCart className="w-8 h-8 text-brand-600" />
+                                    <span className="absolute -top-2 -right-2 bg-brand-600 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+                                        {getCartCount()}
+                                    </span>
+                                </div>
+                            )}
+
+                            {/* Profile Dropdown */}
+                            {session?.user && (
+                                <ProfileDropdown
+                                    userName={session.user.name || 'Guest'}
+                                    userEmail={session.user.email}
+                                    userRole={session.user.role}
+                                />
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -148,8 +171,8 @@ export default function MenuPage() {
                                 key={shop.id}
                                 onClick={() => setSelectedShopId(shop.id)}
                                 className={`flex items-center gap-2 px-6 py-3 rounded-lg whitespace-nowrap transition-all ${selectedShop === shop.id
-                                    ? 'bg-brand-600 text-white shadow-lg'
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'bg-brand-600 text-white shadow-lg'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                     }`}
                             >
                                 <ChefHat className="w-5 h-5" />
