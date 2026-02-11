@@ -180,3 +180,18 @@ export async function getSession() {
         return null;
     }
 }
+
+export async function logoutAction() {
+    try {
+        const cookieStore = await cookies();
+        cookieStore.delete('auth_token');
+
+        return { success: true, message: 'Logged out successfully' };
+    } catch (error: any) {
+        console.error('Logout Error:', error);
+        return {
+            success: false,
+            message: 'Failed to logout. Please try again.'
+        };
+    }
+}

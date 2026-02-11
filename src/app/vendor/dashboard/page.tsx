@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { parseMenuImage, ParsedMenuItem, saveMenuItems } from '@/app/actions/menu';
 import { getVendorShops } from '@/app/actions/shop';
 import { Upload, Loader2, CheckCircle, XCircle } from 'lucide-react';
+import ProfileDropdown from '@/components/ProfileDropdown';
 
 export default function VendorDashboardPage() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
