@@ -44,6 +44,9 @@ export async function signupAction(prevState: any, formData: FormData) {
 
         const { name, email, password } = result.data;
 
+        // Get role from form data (default to 'user' if not provided)
+        const role = (formData.get('role') as string) || 'user';
+
         await dbConnect();
 
         // Check if user exists
@@ -55,12 +58,12 @@ export async function signupAction(prevState: any, formData: FormData) {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create user
+        // Create user with specified role
         const newUser = await User.create({
             name,
             email,
             password: hashedPassword,
-            role: 'user', // Default role
+            role, // Use role from form data
         });
 
         // Automatically log in the user (set cookie)
