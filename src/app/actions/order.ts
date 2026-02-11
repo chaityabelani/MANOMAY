@@ -97,8 +97,8 @@ export async function updateOrderStatus(orderId: string, newStatus: string) {
         }
 
         // Validate status
-        const validStatuses = ['placed', 'preparing', 'ready', 'delivered', 'cancelled'];
-        if (!validStatuses.includes(newStatus)) {
+        const validStatuses = ['placed', 'preparing', 'ready', 'delivered', 'cancelled'] as const;
+        if (!validStatuses.includes(newStatus as any)) {
             return { success: false, error: 'Invalid status' };
         }
 
@@ -119,7 +119,7 @@ export async function updateOrderStatus(orderId: string, newStatus: string) {
         }
 
         // Update status
-        order.status = newStatus;
+        order.status = newStatus as 'placed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
         await order.save();
 
         return {
