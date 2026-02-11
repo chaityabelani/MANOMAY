@@ -37,6 +37,8 @@
     "**/*.mts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "verify-models.ts",
+    "test-menu-scan.ts"
   ]
 }
