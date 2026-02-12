@@ -7,6 +7,7 @@ export interface IProduct extends Document {
     price: number;
     category: string; // e.g., 'Starter', 'Main Course', 'Dessert'
     image?: string;
+    isVeg?: boolean; // Vegetarian indicator
     embedding?: number[]; // Vector embedding for AI search
     isAvailable: boolean;
     createdAt: Date;
@@ -40,6 +41,10 @@ const ProductSchema: Schema<IProduct> = new Schema(
         },
         image: {
             type: String,
+        },
+        isVeg: {
+            type: Boolean,
+            default: false, // Default to non-veg if not specified
         },
         embedding: {
             type: [Number], // For vector search
