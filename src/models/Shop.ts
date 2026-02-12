@@ -1,13 +1,13 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IShop extends Document {
-    parkId: mongoose.Types.ObjectId;
     name: string;
     description?: string;
+    parkId: mongoose.Types.ObjectId;
+    ownerId: mongoose.Types.ObjectId;
     cuisineType: string[];
-    ownerId: mongoose.Types.ObjectId; // Reference to the Vendor User
-    image?: string;
     logo?: string;
+    image?: string;
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
@@ -15,28 +15,35 @@ export interface IShop extends Document {
 
 const ShopSchema: Schema<IShop> = new Schema(
     {
+        name: {
+            type: String,
+            required: [true, 'Shop name is required'],
+            trim: true,
+        },
+        description: {
+            type: String,
+        },
         parkId: {
             type: Schema.Types.ObjectId,
             ref: 'FoodPark',
             required: true,
             index: true,
         },
-        name: {
-            type: String,
-            required: [true, 'Please provide a shop name'],
-        },
-        description: String,
-        cuisineType: {
-            type: [String],
-            default: [],
-        },
         ownerId: {
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: true,
         },
-        image: String,
-        logo: String,
+        cuisineType: {
+            type: [String],
+            default: [],
+        },
+        logo: {
+            type: String,
+        },
+        image: {
+            type: String,
+        },
         isActive: {
             type: Boolean,
             default: true,
@@ -47,7 +54,6 @@ const ShopSchema: Schema<IShop> = new Schema(
     }
 );
 
-// Prevent overwrite of model if already compiled
 const Shop: Model<IShop> =
     mongoose.models.Shop || mongoose.model<IShop>('Shop', ShopSchema);
 

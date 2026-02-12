@@ -2,13 +2,13 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IFoodPark extends Document {
     name: string;
-    location: {
-        lat: number;
-        lng: number;
-        address?: string;
-    };
-    adminId: mongoose.Types.ObjectId; // Reference to the Super Admin User
+    location: string;
+    adminId: mongoose.Types.ObjectId;
     isActive: boolean;
+    tables: {
+        number: string;
+        qrCode: string;
+    }[];
     createdAt: Date;
     updatedAt: Date;
 }
@@ -17,13 +17,12 @@ const FoodParkSchema: Schema<IFoodPark> = new Schema(
     {
         name: {
             type: String,
-            required: [true, 'Please provide a name for the Food Park'],
-            unique: true,
+            required: [true, 'Food park name is required'],
+            trim: true,
         },
         location: {
-            lat: Number,
-            lng: Number,
-            address: String,
+            type: String,
+            required: [true, 'Location is required'],
         },
         adminId: {
             type: Schema.Types.ObjectId,
@@ -34,13 +33,24 @@ const FoodParkSchema: Schema<IFoodPark> = new Schema(
             type: Boolean,
             default: true,
         },
+        tables: [
+            {
+                number: {
+                    type: String,
+                    required: true,
+                },
+                qrCode: {
+                    type: String,
+                    required: true,
+                },
+            },
+        ],
     },
     {
         timestamps: true,
     }
 );
 
-// Prevent overwrite of model if already compiled
 const FoodPark: Model<IFoodPark> =
     mongoose.models.FoodPark || mongoose.model<IFoodPark>('FoodPark', FoodParkSchema);
 

@@ -3,8 +3,9 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export interface IUser extends Document {
     name: string;
     email: string;
-    password?: string; // Optional because we might select: false
-    role: 'admin' | 'staff' | 'user' | 'vendor' | 'superadmin';
+    password: string;
+    role: 'super-admin' | 'vendor' | 'customer';
+    shopId?: mongoose.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -13,28 +14,28 @@ const UserSchema: Schema<IUser> = new Schema(
     {
         name: {
             type: String,
-            required: [true, 'Please provide a name'],
-            maxlength: [60, 'Name cannot be more than 60 characters'],
+            required: [true, 'Name is required'],
+            trim: true,
         },
         email: {
             type: String,
-            required: [true, 'Please provide an email'],
+            required: [true, 'Email is required'],
             unique: true,
-            match: [
-                /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-                'Please email a valid email address',
-            ],
+            lowercase: true,
+            trim: true,
         },
         password: {
             type: String,
-            required: [true, 'Please provide a password'],
-            minlength: [6, 'Password must be at least 6 characters'],
-            select: false, // 🛡️ CRITICAL: Never return password by default
+            required: [true, 'Password is required'],
         },
         role: {
             type: String,
-            enum: ['admin', 'staff', 'user', 'vendor', 'superadmin'],
-            default: 'user',
+            enum: ['super-admin', 'vendor', 'customer'],
+            default: 'customer',
+        },
+        shopId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Shop',
         },
     },
     {
@@ -42,7 +43,6 @@ const UserSchema: Schema<IUser> = new Schema(
     }
 );
 
-// Prevent overwrite of model if already compiled
 const User: Model<IUser> =
     mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 

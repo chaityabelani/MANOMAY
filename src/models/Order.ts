@@ -2,23 +2,22 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IOrderItem {
     productId: mongoose.Types.ObjectId;
-    shopId: mongoose.Types.ObjectId;
+    shopId: mongoose.Types.ObjectId; // CRITICAL: for splitting orders to vendors
     name: string;
-    quantity: number;
     price: number;
-    options?: Map<string, any>;
+    quantity: number;
+    customizations?: Record<string, any>;
 }
 
 export interface IOrder extends Document {
-    parkId?: mongoose.Types.ObjectId; // Optional
-    tableSessionId?: mongoose.Types.ObjectId; // Optional
-    tableNumber?: string; // Optional
-    userId?: mongoose.Types.ObjectId; // Optional: specific user if logged in
-    status: 'placed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
+    parkId?: mongoose.Types.ObjectId;
+    tableNumber?: string;
+    userId?: mongoose.Types.ObjectId;
     items: IOrderItem[];
     totalAmount: number;
+    status: 'placed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
     paymentStatus: 'pending' | 'paid' | 'failed';
-    paymentId?: string; // Stripe Payment Intent ID
+    paymentId?: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -32,12 +31,12 @@ const OrderItemSchema = new Schema({
     shopId: {
         type: Schema.Types.ObjectId,
         ref: 'Shop',
-        required: true,
+        required: true, // MUST have shopId to split orders
     },
     name: String,
-    quantity: { type: Number, required: true, min: 1 },
     price: { type: Number, required: true },
-    options: { type: Map, of: Schema.Types.Mixed },
+    quantity: { type: Number, required: true, min: 1 },
+    customizations: { type: Schema.Types.Mixed },
 });
 
 const OrderSchema: Schema<IOrder> = new Schema(
@@ -45,31 +44,23 @@ const OrderSchema: Schema<IOrder> = new Schema(
         parkId: {
             type: Schema.Types.ObjectId,
             ref: 'FoodPark',
-            required: false, // Optional for now
-            index: true,
-        },
-        tableSessionId: {
-            type: Schema.Types.ObjectId,
-            ref: 'TableSession',
-            required: false, // Optional for now
         },
         tableNumber: {
             type: String,
-            required: false, // Optional for now
         },
         userId: {
             type: Schema.Types.ObjectId,
             ref: 'User',
         },
-        status: {
-            type: String,
-            enum: ['placed', 'preparing', 'ready', 'delivered', 'cancelled'],
-            default: 'placed',
-        },
         items: [OrderItemSchema],
         totalAmount: {
             type: Number,
             required: true,
+        },
+        status: {
+            type: String,
+            enum: ['placed', 'preparing', 'ready', 'delivered', 'cancelled'],
+            default: 'placed',
         },
         paymentStatus: {
             type: String,
@@ -83,7 +74,6 @@ const OrderSchema: Schema<IOrder> = new Schema(
     }
 );
 
-// Prevent overwrite of model if already compiled
 const Order: Model<IOrder> =
     mongoose.models.Order || mongoose.model<IOrder>('Order', OrderSchema);
 
