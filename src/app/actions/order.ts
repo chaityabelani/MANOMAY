@@ -150,9 +150,9 @@ export async function createOrder(cartItems: any[], totalAmount: number, parkId?
 
         // Create the order
         const newOrder = await Order.create({
-            userId: session?.user?._id || null, // null for guest users
-            parkId: parkId || null, // Optional: Food park context
-            tableNumber: tableNumber || null, // Optional: Table/kiosk number
+            userId: session?.user?._id || undefined, // undefined for guest users
+            parkId: parkId || undefined, // Optional: Food park context
+            tableNumber: tableNumber || undefined, // Optional: Table/kiosk number
             items: cartItems.map(item => ({
                 productId: item.id,
                 shopId: item.shopId, // Must be present in cart items
