@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { getSession } from "@/app/actions/auth";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,14 +17,11 @@ export const metadata: Metadata = {
   description: "Delicious street food, served fresh.",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getSession();
-  const user = session?.user || null;
-
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <head>
@@ -86,13 +80,7 @@ export default async function RootLayout({
         `}</style>
       </head>
       <body className={inter.className}>
-        <div className="flex min-h-screen flex-col bg-mandala-watermark">
-          <Header user={user} />
-          <main className="flex-1 flex flex-col">
-            {children}
-          </main>
-          <Footer />
-        </div>
+        {children}
       </body>
     </html>
   );
