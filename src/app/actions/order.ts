@@ -109,7 +109,12 @@ export async function getShopOrders(vendorId: string) {
                 tableNumber: o.tableNumber,
                 customerName: o.customerName,
                 customerPhone: o.customerPhone,
-                items: o.items,
+                items: o.items.map(item => ({
+                    productId: item.productId.toString(),
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                })),
                 totalAmount: o.totalAmount,
                 status: o.status,
                 createdAt: o.createdAt.toISOString(),
