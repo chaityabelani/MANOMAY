@@ -16,7 +16,7 @@ export default function LoginPage() {
         setLoading(true);
         setError('');
 
-        const result = await loginAction(null, formData);
+        const result = await loginAction(null, formData, 'user');
 
         if (result.success) {
             router.push('/');

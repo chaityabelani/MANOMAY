@@ -16,7 +16,7 @@ export default function SignupPage() {
         setLoading(true);
         setError('');
 
-        const result = await signupAction(null, formData);
+        const result = await signupAction(null, formData, 'user');
 
         if (result.success) {
             router.push('/');

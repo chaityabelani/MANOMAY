@@ -23,7 +23,11 @@ const LoginSchema = z.object({
 
 // --- Actions ---
 
-export async function signupAction(prevState: any, formData: FormData) {
+export async function signupAction(
+    prevState: any,
+    formData: FormData,
+    requiredRole?: 'user' | 'vendor' | 'admin'
+) {
     try {
         // 1. Validate Environment (Graceful Failure)
         const envCheck = validateEnv();
@@ -44,8 +48,8 @@ export async function signupAction(prevState: any, formData: FormData) {
 
         const { name, email, password } = result.data;
 
-        // Get role from form data (default to 'user' if not provided)
-        const role = (formData.get('role') as string) || 'user';
+        // Use requiredRole parameter if provided, otherwise default to 'user'
+        const role = requiredRole || 'user';
 
         await dbConnect();
 
@@ -80,7 +84,11 @@ export async function signupAction(prevState: any, formData: FormData) {
     }
 }
 
-export async function loginAction(prevState: any, formData: FormData) {
+export async function loginAction(
+    prevState: any,
+    formData: FormData,
+    requiredRole?: 'user' | 'vendor' | 'admin'
+) {
     try {
         // 1. Validate Environment (Graceful Failure)
         const envCheck = validateEnv();
@@ -107,6 +115,14 @@ export async function loginAction(prevState: any, formData: FormData) {
 
         if (!user) {
             return { success: false, message: 'Invalid credentials' };
+        }
+
+        // 🔒 Role Authorization Check
+        if (requiredRole && user.role !== requiredRole) {
+            return {
+                success: false,
+                message: `Access Denied. This account is not registered as a ${requiredRole}.`
+            };
         }
 
         const isMatch = await bcrypt.compare(password, user.password!);

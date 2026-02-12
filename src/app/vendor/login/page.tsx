@@ -19,7 +19,7 @@ export default function VendorLoginPage() {
         setFieldErrors({});
 
         const formData = new FormData(e.currentTarget);
-        const result = await loginAction(null, formData);
+        const result = await loginAction(null, formData, 'vendor');
 
         if (result.success) {
             router.push('/vendor/dashboard');

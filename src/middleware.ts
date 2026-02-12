@@ -1,53 +1,69 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { jwtVerify } from 'jose';
 
-export function middleware(request: NextRequest) {
-    // Get the path for the incoming request
+export async function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname;
+    const token = request.cookies.get('auth_token')?.value;
 
-    // Define public paths that don't require authentication
-    const publicPaths = [
-        '/login',
-        '/signup',
-        '/vendor/login',    // Allow vendor login
-        '/vendor/signup',   // Allow vendor registration
-        '/api/auth',
-        '/api/test-db'
-    ];
+    // Define route patterns
+    const isVendorRoute = path.startsWith('/vendor') && !path.includes('/login') && !path.includes('/signup');
+    const isAuthPage = ['/login', '/signup', '/vendor/login', '/vendor/signup'].some(p => path.startsWith(p));
 
-    // Check if the current path is public
-    const isPublicPath = publicPaths.some((pp) => path.startsWith(pp));
+    // Handle public auth pages (login/signup)
+    if (isAuthPage) {
+        // If already logged in, redirect to appropriate dashboard
+        if (token) {
+            try {
+                const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'fallback_secret_dev_only');
+                const { payload } = await jwtVerify(token, secret);
+                const userRole = payload.role as string;
 
-    // Get the token from the cookies
-    const token = request.cookies.get('auth_token')?.value || '';
-
-    // Redirect logic
-    if (isPublicPath && token) {
-        // If user is already logged in and tries to access public auth pages, redirect to home
-        if (path === '/login' || path === '/signup') {
-            return NextResponse.redirect(new URL('/', request.nextUrl));
+                // Redirect based on role
+                if (userRole === 'vendor') {
+                    return NextResponse.redirect(new URL('/vendor/dashboard', request.url));
+                } else {
+                    return NextResponse.redirect(new URL('/', request.url));
+                }
+            } catch {
+                // Invalid token, allow access to login/signup
+            }
         }
+        return NextResponse.next();
     }
 
-    if (!isPublicPath && !token) {
-        // If user is not logged in and tries to access a protected route, redirect to login
-        return NextResponse.redirect(new URL('/login', request.nextUrl));
+    // Require authentication for all protected routes
+    if (!token) {
+        return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    return NextResponse.next();
+    // Verify role for protected routes
+    try {
+        const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'fallback_secret_dev_only');
+        const { payload } = await jwtVerify(token, secret);
+        const userRole = payload.role as string;
+
+        // Block non-vendors from vendor routes
+        if (isVendorRoute && userRole !== 'vendor' && userRole !== 'admin') {
+            return NextResponse.redirect(new URL('/', request.url));
+        }
+
+        return NextResponse.next();
+    } catch {
+        // Invalid/expired token - redirect to login
+        return NextResponse.redirect(new URL('/login', request.url));
+    }
 }
 
-// Ensure middleware runs on relevant paths
 export const config = {
     matcher: [
         /*
-         * Match all request paths except for the ones starting with:
-         * - api (API routes) -> actually we want to protect some API routes, but let's exclude for now to be safe, 
-         *   or selectively protect. The logic above handles /api/auth as public.
+         * Match all request paths except:
+         * - api routes (they have their own auth)
          * - _next/static (static files)
          * - _next/image (image optimization files)
          * - favicon.ico (favicon file)
          */
-        '/((?!_next/static|_next/image|favicon.ico).*)',
+        '/((?!api|_next/static|_next/image|favicon.ico).*)',
     ],
 };

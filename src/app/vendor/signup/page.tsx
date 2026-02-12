@@ -19,11 +19,7 @@ export default function VendorSignupPage() {
         setFieldErrors({});
 
         const formData = new FormData(e.currentTarget);
-
-        // Add vendor role to form data
-        formData.append('role', 'vendor');
-
-        const result = await signupAction(null, formData);
+        const result = await signupAction(null, formData, 'vendor');
 
         if (result.success) {
             router.push('/vendor/dashboard');
