@@ -1,165 +1,129 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { loginAction } from '@/app/actions/auth';
-import { Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Mail, Lock, ShoppingBag, Loader2, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { Button, Input } from '@/components/ui';
 
 export default function LoginPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    async function handleSubmit(formData: FormData) {
         setLoading(true);
         setError('');
-        setFieldErrors({});
 
-        const formData = new FormData(e.currentTarget);
-        const result = await loginAction(null, formData);
+        const result = await loginAction(formData);
 
         if (result.success) {
             router.push('/');
             router.refresh();
         } else {
-            if (result.errors) {
-                setFieldErrors(result.errors);
-            }
-            if (result.message) {
-                setError(result.message);
-            }
+            setError(result.message || 'Login failed');
             setLoading(false);
         }
-    };
+    }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-400 via-red-500 to-pink-600 p-4">
-            {/* Animated Background Circles */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-red-50 relative overflow-hidden">
+            {/* Animated Background Shapes */}
+            <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute top-20 left-10 w-72 h-72 bg-brand-200/30 rounded-full blur-3xl animate-float"></div>
+                <div className="absolute bottom-20 right-10 w-96 h-96 bg-amber-200/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+                <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-orange-200/20 rounded-full blur-3xl animate-pulse-ring"></div>
             </div>
 
-            {/* Login Card */}
-            <div className="relative w-full max-w-md">
-                {/* Glass Card */}
-                <div className="glass-pro rounded-3xl shadow-2xl p-8 backdrop-blur-xl border border-white/30">
+            {/* Content */}
+            <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-12">
+                <div className="w-full max-w-md">
                     {/* Logo/Brand */}
-                    <div className="text-center mb-8">
-                        <h1 className="text-4xl font-display font-bold text-white mb-2">
-                            Manomay
-                        </h1>
-                        <p className="text-white/80 text-sm">
-                            Food Park Experience
-                        </p>
+                    <div className="text-center mb-8 animate-slide-up">
+                        <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-brand-500 to-brand-600 rounded-2xl shadow-glow mb-4">
+                            <ShoppingBag className="w-10 h-10 text-white" />
+                        </div>
+                        <h1 className="text-4xl font-bold text-slate-900 mb-2">Welcome Back</h1>
+                        <p className="text-slate-600">Sign in to continue your food journey</p>
                     </div>
 
-                    {/* Sign In Header */}
-                    <h2 className="text-2xl font-bold text-white text-center mb-6">
-                        Welcome Back
-                    </h2>
+                    {/* Login Card */}
+                    <div className="bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                        <form action={handleSubmit} className="space-y-6">
+                            {/* Email */}
+                            <Input
+                                type="email"
+                                name="email"
+                                placeholder="your@email.com"
+                                required
+                                icon={<Mail className="w-5 h-5" />}
+                                label="Email Address"
+                            />
 
-                    {/* Error Alert */}
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-500/20 border border-red-300/40 rounded-xl flex items-start gap-3">
-                            <AlertCircle className="w-5 h-5 text-red-100 flex-shrink-0 mt-0.5" />
-                            <p className="text-red-100 text-sm">{error}</p>
-                        </div>
-                    )}
+                            {/* Password */}
+                            <Input
+                                type="password"
+                                name="password"
+                                placeholder="••••••••"
+                                required
+                                icon={<Lock className="w-5 h-5" />}
+                                label="Password"
+                            />
 
-                    {/* Login Form */}
-                    <form onSubmit={handleSubmit} className="space-y-5">
-                        {/* Email Input */}
-                        <div>
-                            <label htmlFor="email" className="block text-white/90 text-sm font-medium mb-2">
-                                Email Address
-                            </label>
-                            <div className="relative">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
-                                <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    autoComplete="email"
-                                    required
-                                    className="w-full pl-12 pr-4 py-3.5 bg-white/20 border border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all"
-                                    placeholder="you@example.com"
-                                />
+                            {/* Error Message */}
+                            {error && (
+                                <div className="p-4 bg-error-50 border border-error-200 rounded-xl">
+                                    <p className="text-sm text-error-700">{error}</p>
+                                </div>
+                            )}
+
+                            {/* Submit Button */}
+                            <Button
+                                type="submit"
+                                variant="primary"
+                                size="lg"
+                                isLoading={loading}
+                                className="w-full"
+                            >
+                                {!loading && (
+                                    <>
+                                        <span>Sign In</span>
+                                        <ArrowRight className="w-5 h-5" />
+                                    </>
+                                )}
+                            </Button>
+
+                            {/* Forgot Password */}
+                            <div className="text-center">
+                                <a href="#" className="text-sm text-brand-600 hover:text-brand-700 font-medium transition-colors">
+                                    Forgot your password?
+                                </a>
                             </div>
-                            {fieldErrors.email && (
-                                <p className="text-xs text-red-200 mt-2 ml-1">{fieldErrors.email[0]}</p>
-                            )}
-                        </div>
-
-                        {/* Password Input */}
-                        <div>
-                            <label htmlFor="password" className="block text-white/90 text-sm font-medium mb-2">
-                                Password
-                            </label>
-                            <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    autoComplete="current-password"
-                                    required
-                                    className="w-full pl-12 pr-4 py-3.5 bg-white/20 border border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all"
-                                    placeholder="••••••••"
-                                />
-                            </div>
-                            {fieldErrors.password && (
-                                <p className="text-xs text-red-200 mt-2 ml-1">{fieldErrors.password[0]}</p>
-                            )}
-                        </div>
-
-                        {/* Submit Button */}
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full mt-6 bg-white hover:bg-white/90 text-orange-600 font-bold py-3.5 px-6 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
-                        >
-                            {loading ? (
-                                <>
-                                    <div className="w-5 h-5 border-2 border-orange-600/30 border-t-orange-600 rounded-full animate-spin"></div>
-                                    <span>Signing In...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span>Sign In</span>
-                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </>
-                            )}
-                        </button>
-                    </form>
-
-                    {/* Divider */}
-                    <div className="relative my-6">
-                        <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-white/20"></div>
-                        </div>
-                        <div className="relative flex justify-center text-sm">
-                            <span className="px-4 bg-transparent text-white/70">or</span>
-                        </div>
+                        </form>
                     </div>
 
                     {/* Sign Up Link */}
-                    <p className="text-center text-white/80 text-sm">
-                        Don't have an account?{' '}
-                        <Link
-                            href="/signup"
-                            className="font-semibold text-white hover:underline transition-all"
-                        >
-                            Create Account
-                        </Link>
-                    </p>
-                </div>
+                    <div className="mt-6 text-center animate-slide-up" style={{ animationDelay: '0.2s' }}>
+                        <p className="text-slate-600">
+                            Don't have an account?{' '}
+                            <Link href="/signup" className="text-brand-600 hover:text-brand-700 font-semibold transition-colors">
+                                Sign up for free
+                            </Link>
+                        </p>
+                    </div>
 
-                {/* Decorative Element */}
-                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-3/4 h-6 bg-gradient-to-b from-black/20 to-transparent blur-xl rounded-full"></div>
+                    {/* Vendor Login Link */}
+                    <div className="mt-4 text-center animate-slide-up" style={{ animationDelay: '0.3s' }}>
+                        <Link
+                            href="/vendor/login"
+                            className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+                        >
+                            <span>Are you a vendor?</span>
+                            <ArrowRight className="w-4 h-4" />
+                        </Link>
+                    </div>
+                </div>
             </div>
         </div>
     );

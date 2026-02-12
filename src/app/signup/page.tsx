@@ -1,183 +1,175 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { signupAction } from '@/app/actions/auth';
-import { Lock, Mail, User, ArrowRight, AlertCircle, Sparkles } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Mail, Lock, User, ShoppingBag, Loader2, ArrowRight, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
+import { Button, Input } from '@/components/ui';
 
 export default function SignupPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    async function handleSubmit(formData: FormData) {
         setLoading(true);
         setError('');
-        setFieldErrors({});
 
-        const formData = new FormData(e.currentTarget);
-        const result = await signupAction(null, formData);
+        const result = await signupAction(formData);
 
         if (result.success) {
             router.push('/');
             router.refresh();
         } else {
-            if (result.errors) {
-                setFieldErrors(result.errors);
-            }
-            if (result.message) {
-                setError(result.message);
-            }
+            setError(result.message || 'Signup failed');
             setLoading(false);
         }
-    };
+    }
+
+    const benefits = [
+        'Quick QR code ordering',
+        'Save your favorite items',
+        'Track order history',
+        'Exclusive offers & deals',
+    ];
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 p-4">
-            {/* Animated Background Circles */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-                <div className="absolute bottom-1/3 left-1/4 w-96 h-96 bg-purple-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-red-50 relative overflow-hidden">
+            {/* Animated Background Shapes */}
+            <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute top-20 left-10 w-72 h-72 bg-brand-200/30 rounded-full blur-3xl animate-float"></div>
+                <div className="absolute bottom-20 right-10 w-96 h-96 bg-amber-200/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+                <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-orange-200/20 rounded-full blur-3xl animate-bounce-slow"></div>
             </div>
 
-            {/* Signup Card */}
-            <div className="relative w-full max-w-md">
-                {/* Glass Card */}
-                <div className="glass-pro rounded-3xl shadow-2xl p-8 backdrop-blur-xl border border-white/30">
-                    {/* Logo/Brand */}
-                    <div className="text-center mb-8">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-4">
-                            <Sparkles className="w-8 h-8 text-white" />
+            {/* Content */}
+            <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-12">
+                <div className="w-full max-w-5xl">
+                    <div className="grid md:grid-cols-2 gap-8 items-center">
+                        {/* Left Side - Benefits */}
+                        <div className="text-center md:text-left animate-slide-up">
+                            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-brand-500 to-brand-600 rounded-2xl shadow-glow mb-6">
+                                <ShoppingBag className="w-10 h-10 text-white" />
+                            </div>
+                            <h1 className="text-5xl font-bold text-slate-900 mb-4">Join the Food Park</h1>
+                            <p className="text-xl text-slate-600 mb-8">
+                                Order from multiple vendors with a single tap
+                            </p>
+
+                            {/* Benefits List */}
+                            <div className="space-y-4">
+                                {benefits.map((benefit, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex items-center gap-3 animate-slide-up"
+                                        style={{ animationDelay: `${0.2 + index * 0.1}s` }}
+                                    >
+                                        <div className="flex-shrink-0 w-8 h-8 bg-success-100 rounded-full flex items-center justify-center">
+                                            <CheckCircle className="w-5 h-5 text-success-600" />
+                                        </div>
+                                        <span className="text-slate-700 font-medium">{benefit}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        <h1 className="text-4xl font-display font-bold text-white mb-2">
-                            Join Manomay
-                        </h1>
-                        <p className="text-white/80 text-sm">
-                            Create your Food Park account
-                        </p>
+
+                        {/* Right Side - Signup Form */}
+                        <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                            <div className="bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-8">
+                                <h2 className="text-2xl font-bold text-slate-900 mb-6">Create Account</h2>
+
+                                <form action={handleSubmit} className="space-y-5">
+                                    {/* Name */}
+                                    <Input
+                                        type="text"
+                                        name="name"
+                                        placeholder="John Doe"
+                                        required
+                                        icon={<User className="w-5 h-5" />}
+                                        label="Full Name"
+                                    />
+
+                                    {/* Email */}
+                                    <Input
+                                        type="email"
+                                        name="email"
+                                        placeholder="your@email.com"
+                                        required
+                                        icon={<Mail className="w-5 h-5" />}
+                                        label="Email Address"
+                                    />
+
+                                    {/* Password */}
+                                    <Input
+                                        type="password"
+                                        name="password"
+                                        placeholder="••••••••"
+                                        required
+                                        icon={<Lock className="w-5 h-5" />}
+                                        label="Password"
+                                    />
+
+                                    {/* Error Message */}
+                                    {error && (
+                                        <div className="p-4 bg-error-50 border border-error-200 rounded-xl">
+                                            <p className="text-sm text-error-700">{error}</p>
+                                        </div>
+                                    )}
+
+                                    {/* Submit Button */}
+                                    <Button
+                                        type="submit"
+                                        variant="primary"
+                                        size="lg"
+                                        isLoading={loading}
+                                        className="w-full"
+                                    >
+                                        {!loading && (
+                                            <>
+                                                <span>Create Account</span>
+                                                <ArrowRight className="w-5 h-5" />
+                                            </>
+                                        )}
+                                    </Button>
+
+                                    {/* Terms */}
+                                    <p className="text-xs text-slate-500 text-center">
+                                        By signing up, you agree to our{' '}
+                                        <a href="#" className="text-brand-600 hover:text-brand-700">
+                                            Terms of Service
+                                        </a>{' '}
+                                        and{' '}
+                                        <a href="#" className="text-brand-600 hover:text-brand-700">
+                                            Privacy Policy
+                                        </a>
+                                    </p>
+                                </form>
+
+                                {/* Login Link */}
+                                <div className="mt-6 text-center">
+                                    <p className="text-slate-600">
+                                        Already have an account?{' '}
+                                        <Link href="/login" className="text-brand-600 hover:text-brand-700 font-semibold transition-colors">
+                                            Sign in
+                                        </Link>
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Vendor Signup Link */}
+                            <div className="mt-4 text-center">
+                                <Link
+                                    href="/vendor/signup"
+                                    className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+                                >
+                                    <span>Want to become a vendor?</span>
+                                    <ArrowRight className="w-4 h-4" />
+                                </Link>
+                            </div>
+                        </div>
                     </div>
-
-                    {/* Error Alert */}
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-500/20 border border-red-300/40 rounded-xl flex items-start gap-3">
-                            <AlertCircle className="w-5 h-5 text-red-100 flex-shrink-0 mt-0.5" />
-                            <p className="text-red-100 text-sm">{error}</p>
-                        </div>
-                    )}
-
-                    {/* Signup Form */}
-                    <form onSubmit={handleSubmit} className="space-y-5">
-                        {/* Name Input */}
-                        <div>
-                            <label htmlFor="name" className="block text-white/90 text-sm font-medium mb-2">
-                                Full Name
-                            </label>
-                            <div className="relative">
-                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
-                                <input
-                                    id="name"
-                                    name="name"
-                                    type="text"
-                                    required
-                                    className="w-full pl-12 pr-4 py-3.5 bg-white/20 border border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all"
-                                    placeholder="John Doe"
-                                />
-                            </div>
-                            {fieldErrors.name && (
-                                <p className="text-xs text-red-200 mt-2 ml-1">{fieldErrors.name[0]}</p>
-                            )}
-                        </div>
-
-                        {/* Email Input */}
-                        <div>
-                            <label htmlFor="email" className="block text-white/90 text-sm font-medium mb-2">
-                                Email Address
-                            </label>
-                            <div className="relative">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
-                                <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    autoComplete="email"
-                                    required
-                                    className="w-full pl-12 pr-4 py-3.5 bg-white/20 border border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all"
-                                    placeholder="you@example.com"
-                                />
-                            </div>
-                            {fieldErrors.email && (
-                                <p className="text-xs text-red-200 mt-2 ml-1">{fieldErrors.email[0]}</p>
-                            )}
-                        </div>
-
-                        {/* Password Input */}
-                        <div>
-                            <label htmlFor="password" className="block text-white/90 text-sm font-medium mb-2">
-                                Password
-                            </label>
-                            <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    required
-                                    className="w-full pl-12 pr-4 py-3.5 bg-white/20 border border-white/30 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all"
-                                    placeholder="Minimum 6 characters"
-                                />
-                            </div>
-                            {fieldErrors.password && (
-                                <p className="text-xs text-red-200 mt-2 ml-1">{fieldErrors.password[0]}</p>
-                            )}
-                        </div>
-
-                        {/* Submit Button */}
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full mt-6 bg-white hover:bg-white/90 text-purple-600 font-bold py-3.5 px-6 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
-                        >
-                            {loading ? (
-                                <>
-                                    <div className="w-5 h-5 border-2 border-purple-600/30 border-t-purple-600 rounded-full animate-spin"></div>
-                                    <span>Creating Account...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span>Create Account</span>
-                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </>
-                            )}
-                        </button>
-                    </form>
-
-                    {/* Divider */}
-                    <div className="relative my-6">
-                        <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-white/20"></div>
-                        </div>
-                        <div className="relative flex justify-center text-sm">
-                            <span className="px-4 bg-transparent text-white/70">or</span>
-                        </div>
-                    </div>
-
-                    {/* Login Link */}
-                    <p className="text-center text-white/80 text-sm">
-                        Already have an account?{' '}
-                        <Link
-                            href="/login"
-                            className="font-semibold text-white hover:underline transition-all"
-                        >
-                            Sign In
-                        </Link>
-                    </p>
                 </div>
-
-                {/* Decorative Element */}
-                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-3/4 h-6 bg-gradient-to-b from-black/20 to-transparent blur-xl rounded-full"></div>
             </div>
         </div>
     );
