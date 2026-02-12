@@ -2,7 +2,7 @@
 
 import connectDB from '@/lib/db';
 import Product from '@/models/Product';
-import Shop from '@/models/Shop';
+import Shop, { IShop } from '@/models/Shop';
 
 export async function getProducts(parkId?: string) {
     try {
@@ -23,20 +23,25 @@ export async function getProducts(parkId?: string) {
             .lean();
 
         // Transform for client
-        return products.map(p => ({
-            id: p._id.toString(),
-            _id: p._id.toString(),
-            name: p.name,
-            description: p.description,
-            price: p.price,
-            category: p.category,
-            image: p.image,
-            isVeg: p.isVeg,
-            isAvailable: p.isAvailable,
-            shopId: p.shopId?._id?.toString() || '',
-            shopName: p.shopId?.name || 'Unknown Shop',
-            shopLogo: p.shopId?.logoUrl || ''
-        }));
+        return products.map(p => {
+            // Cast populated shopId to IShop for TypeScript
+            const shop = p.shopId as unknown as IShop;
+
+            return {
+                id: p._id.toString(),
+                _id: p._id.toString(),
+                name: p.name,
+                description: p.description,
+                price: p.price,
+                category: p.category,
+                image: p.image,
+                isVeg: p.isVeg,
+                isAvailable: p.isAvailable,
+                shopId: shop?._id?.toString() || '',
+                shopName: shop?.name || 'Unknown Shop',
+                shopLogo: shop?.logo || '' // Correct field name is 'logo'
+            };
+        });
 
     } catch (error: any) {
         console.error('Error fetching products:', error);
@@ -56,6 +61,9 @@ export async function getProductById(productId: string) {
             return null;
         }
 
+        // Cast populated shopId to IShop
+        const shop = product.shopId as unknown as IShop;
+
         return {
             id: product._id.toString(),
             _id: product._id.toString(),
@@ -66,9 +74,9 @@ export async function getProductById(productId: string) {
             image: product.image,
             isVeg: product.isVeg,
             isAvailable: product.isAvailable,
-            shopId: product.shopId?._id?.toString() || '',
-            shopName: product.shopId?.name || 'Unknown Shop',
-            shopLogo: product.shopId?.logoUrl || ''
+            shopId: shop?._id?.toString() || '',
+            shopName: shop?.name || 'Unknown Shop',
+            shopLogo: shop?.logo || '' // Correct field name is 'logo'
         };
 
     } catch (error: any) {
