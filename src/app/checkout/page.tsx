@@ -2,7 +2,7 @@
 
 import { useCartStore } from '@/store/useCartStore';
 import { createOrder } from '@/app/actions/order';
-import { useState } from 'use';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function CheckoutPage() {
