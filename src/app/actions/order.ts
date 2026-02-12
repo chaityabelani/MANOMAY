@@ -2,6 +2,7 @@
 
 import connectDB from '@/lib/db';
 import Order from '@/models/Order';
+import Shop from '@/models/Shop';
 import { revalidatePath } from 'next/cache';
 
 interface OrderItem {
@@ -85,11 +86,18 @@ export async function createOrder(data: CreateOrderData) {
 /**
  * Get orders for a specific shop (vendor view)
  */
-export async function getShopOrders(shopId: string) {
+export async function getShopOrders(vendorId: string) {
     try {
         await connectDB();
 
-        const orders = await Order.find({ shopId })
+        // First get the vendor's shop
+        const shop = await Shop.findOne({ ownerId: vendorId }).lean();
+
+        if (!shop) {
+            return { success: true, orders: [] };
+        }
+
+        const orders = await Order.find({ shopId: shop._id })
             .sort({ createdAt: -1 })
             .limit(50)
             .lean();
