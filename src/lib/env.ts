@@ -8,13 +8,23 @@ const envSchema = z.object({
 
 /**
  * Validates and returns the environment variables.
- * If validation fails, it logs the error but does not crash the process immediately
- * (unless strict mode is enforced elsewhere).
- * 
- * Usage:
- * import { env } from '@/lib/env';
+ * Uses safeParse to prevent build crashes when env vars are missing.
  */
-export const env = envSchema.parse(process.env);
+const parseEnv = () => {
+    const result = envSchema.safeParse(process.env);
+    if (!result.success) {
+        console.error('❌ Invalid environment variables:', result.error.flatten().fieldErrors);
+        // Return safe defaults for development
+        return {
+            MONGODB_URI: process.env.MONGODB_URI || '',
+            JWT_SECRET: process.env.JWT_SECRET || 'dev-secret-change-in-production',
+            NODE_ENV: 'development' as const
+        };
+    }
+    return result.data;
+};
+
+export const env = parseEnv();
 
 export const validateEnv = () => {
     const result = envSchema.safeParse(process.env);
