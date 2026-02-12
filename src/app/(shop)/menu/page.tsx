@@ -13,7 +13,7 @@ import type { Product } from "@/types";
 
 export default function MenuPage() {
     const [activeCategory, setActiveCategory] = useState("all");
-    const [products, setProducts] = useState<Product[]>([]);
+    const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const { getTotalItems, getTotalPrice } = useCartStore();
 
@@ -21,7 +21,7 @@ export default function MenuPage() {
         async function fetchProducts() {
             setLoading(true);
             const fetchedProducts = await getProducts();
-            setProducts(fetchedProducts as Product[]);
+            setProducts(fetchedProducts);
             setLoading(false);
         }
         fetchProducts();
