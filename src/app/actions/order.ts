@@ -163,8 +163,7 @@ export async function createOrder(cartItems: any[], totalAmount: number, parkId?
             })),
             totalAmount: totalAmount,
             status: 'placed',
-            paymentStatus: 'paid', // Assuming successful payment
-            paymentMethod: 'online' // or 'cash' if cash payment
+            paymentStatus: 'paid' // Assuming successful payment
         });
 
         return {
