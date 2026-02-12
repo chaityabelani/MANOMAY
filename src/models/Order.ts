@@ -10,9 +10,9 @@ export interface IOrderItem {
 }
 
 export interface IOrder extends Document {
-    parkId: mongoose.Types.ObjectId;
-    tableSessionId: mongoose.Types.ObjectId;
-    tableNumber: string;
+    parkId?: mongoose.Types.ObjectId; // Optional
+    tableSessionId?: mongoose.Types.ObjectId; // Optional
+    tableNumber?: string; // Optional
     userId?: mongoose.Types.ObjectId; // Optional: specific user if logged in
     status: 'placed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
     items: IOrderItem[];
@@ -45,17 +45,17 @@ const OrderSchema: Schema<IOrder> = new Schema(
         parkId: {
             type: Schema.Types.ObjectId,
             ref: 'FoodPark',
-            required: true,
+            required: false, // Optional for now
             index: true,
         },
         tableSessionId: {
             type: Schema.Types.ObjectId,
             ref: 'TableSession',
-            required: true,
+            required: false, // Optional for now
         },
         tableNumber: {
             type: String,
-            required: true,
+            required: false, // Optional for now
         },
         userId: {
             type: Schema.Types.ObjectId,
