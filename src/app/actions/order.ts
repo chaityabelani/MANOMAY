@@ -138,3 +138,44 @@ export async function updateOrderStatus(orderId: string, newStatus: string) {
         };
     }
 }
+
+export async function createOrder(cartItems: any[], totalAmount: number, parkId?: string, tableNumber?: string) {
+    try {
+        await connectDB();
+        const session = await getSession();
+
+        if (cartItems.length === 0) {
+            return { success: false, error: "Cart is empty" };
+        }
+
+        // Create the order
+        const newOrder = await Order.create({
+            userId: session?.user?._id || null, // null for guest users
+            parkId: parkId || null, // Optional: Food park context
+            tableNumber: tableNumber || null, // Optional: Table/kiosk number
+            items: cartItems.map(item => ({
+                productId: item.id,
+                shopId: item.shopId, // Must be present in cart items
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                customizations: item.customizations || {}
+            })),
+            totalAmount: totalAmount,
+            status: 'placed',
+            paymentStatus: 'paid', // Assuming successful payment
+            paymentMethod: 'online' // or 'cash' if cash payment
+        });
+
+        return {
+            success: true,
+            orderId: newOrder._id.toString(),
+            orderNumber: `#${newOrder._id.toString().slice(-6).toUpperCase()}`
+        };
+
+    } catch (error: any) {
+        console.error("Create Order Error:", error);
+        return { success: false, error: error.message || "Failed to place order" };
+    }
+}
+

@@ -2,14 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/useCartStore";
+import { createOrder } from "@/app/actions/order";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, CreditCard, Loader2, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function CheckoutPage() {
-    const { clearCart, getTotalPrice } = useCartStore();
+    const { items, clearCart, getTotalPrice } = useCartStore();
     const [status, setStatus] = useState<"idle" | "processing" | "success">("idle");
+    const [orderNumber, setOrderNumber] = useState<string>("");
     const router = useRouter();
     const total = getTotalPrice();
 
@@ -23,11 +25,19 @@ export default function CheckoutPage() {
         }
     }, [status, clearCart, router]);
 
-    const handlePayment = () => {
+    const handlePayment = async () => {
         setStatus("processing");
-        setTimeout(() => {
+
+        // Call the server action to save the order
+        const result = await createOrder(items, total);
+
+        if (result.success) {
+            setOrderNumber(result.orderNumber || "");
             setStatus("success");
-        }, 2000);
+        } else {
+            alert("Order failed: " + (result.error || "Unknown error"));
+            setStatus("idle");
+        }
     };
 
     if (status === "success") {
@@ -35,6 +45,11 @@ export default function CheckoutPage() {
             <div className="flex flex-col items-center justify-center flex-1 p-8 text-center animate-in fade-in zoom-in duration-500">
                 <CheckCircle2 className="h-32 w-32 text-green-500 mb-6" />
                 <h1 className="text-4xl font-bold mb-4">Order Confirmed!</h1>
+                {orderNumber && (
+                    <p className="text-2xl font-semibold text-primary mb-4">
+                        Order {orderNumber}
+                    </p>
+                )}
                 <p className="text-xl text-muted-foreground mb-8">
                     Please take your receipt from the counter.
                 </p>

@@ -1,22 +1,48 @@
 "use client";
 
-import { useState } from "react";
-import { CATEGORIES, PRODUCTS } from "@/data/mockData";
+import { useState, useEffect } from "react";
+import { CATEGORIES } from "@/data/mockData";
+import { getProducts } from "@/app/actions/product";
 import { ProductCard } from "@/components/feature/ProductCard";
 import { CategoryTabs } from "@/components/feature/CategoryTabs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/useCartStore";
-import { ShoppingCart, ArrowRight } from "lucide-react";
+import { ShoppingCart, ArrowRight, Loader2 } from "lucide-react";
+import type { Product } from "@/types";
 
 export default function MenuPage() {
     const [activeCategory, setActiveCategory] = useState("all");
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
     const { getTotalItems, getTotalPrice } = useCartStore();
 
+    useEffect(() => {
+        async function fetchProducts() {
+            setLoading(true);
+            const fetchedProducts = await getProducts();
+            setProducts(fetchedProducts as Product[]);
+            setLoading(false);
+        }
+        fetchProducts();
+    }, []);
+
+    // Map database categories to UI categories if needed
     const filteredProducts =
         activeCategory === "all"
-            ? PRODUCTS
-            : PRODUCTS.filter((p) => p.categoryId === activeCategory);
+            ? products
+            : products.filter((p) => p.category?.toLowerCase() === activeCategory.toLowerCase());
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center">
+                    <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+                    <p className="text-slate-600">Loading menu...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col min-h-screen bg-slate-50">
