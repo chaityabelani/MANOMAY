@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { saveBulkProducts } from '@/app/actions/product';
 
 interface ScannedProduct {
     name: string;
@@ -14,6 +15,7 @@ export default function AIMenuScanner() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
     const [scannedProducts, setScannedProducts] = useState<ScannedProduct[]>([]);
     const [error, setError] = useState('');
 
@@ -59,6 +61,21 @@ export default function AIMenuScanner() {
             setError(err.message || 'Network error');
         } finally {
             setLoading(false);
+        }
+    }
+
+    async function handleSaveAll() {
+        setSaving(true);
+        setError('');
+
+        const result = await saveBulkProducts(scannedProducts);
+
+        if (result.success) {
+            alert(`✅ Saved ${result.count} products successfully!`);
+            router.push('/vendor/dashboard/products');
+        } else {
+            setError(result.error || 'Failed to save products');
+            setSaving(false);
         }
     }
 
@@ -178,8 +195,12 @@ export default function AIMenuScanner() {
                                 </div>
 
                                 <div className="mt-6 space-y-3">
-                                    <button className="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition">
-                                        ✅ Add All to Menu
+                                    <button
+                                        onClick={handleSaveAll}
+                                        disabled={saving}
+                                        className="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition disabled:opacity-50"
+                                    >
+                                        {saving ? 'Saving...' : `✅ Add All ${scannedProducts.length} Products to Menu`}
                                     </button>
                                     <button
                                         onClick={() => setScannedProducts([])}
