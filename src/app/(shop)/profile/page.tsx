@@ -33,7 +33,7 @@ export default function ProfilePage() {
         if (result.success) {
             // Redirect based on role
             if (session?.user?.role === 'vendor') {
-                router.push('/vendor/login');
+                router.push('/vendor-login');
             } else {
                 router.push('/login');
             }

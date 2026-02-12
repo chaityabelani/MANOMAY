@@ -168,7 +168,7 @@ export default function VendorSignupPage() {
                     <p className="text-center text-white/80 text-sm mb-4">
                         Already have an account?{' '}
                         <Link
-                            href="/vendor/login"
+                            href="/vendor-login"
                             className="font-semibold text-white hover:underline transition-all"
                         >
                             Sign In

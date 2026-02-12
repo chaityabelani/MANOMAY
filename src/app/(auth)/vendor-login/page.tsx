@@ -153,7 +153,7 @@ export default function VendorLoginPage() {
                     <p className="text-center text-white/80 text-sm mb-4">
                         New vendor?{' '}
                         <Link
-                            href="/vendor/signup"
+                            href="/vendor-signup"
                             className="font-semibold text-white hover:underline transition-all"
                         >
                             Register Your Shop

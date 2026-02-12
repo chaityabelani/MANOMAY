@@ -7,8 +7,8 @@ export async function middleware(request: NextRequest) {
     const token = request.cookies.get('auth_token')?.value;
 
     // Define route patterns
-    const isVendorRoute = path.startsWith('/vendor') && !path.includes('/login') && !path.includes('/signup');
-    const isAuthPage = ['/login', '/signup', '/vendor/login', '/vendor/signup'].some(p => path.startsWith(p));
+    const isVendorRoute = path.startsWith('/vendor');
+    const isAuthPage = ['/login', '/signup', '/vendor-login', '/vendor-signup'].some(p => path.startsWith(p));
 
     // Handle public auth pages (login/signup)
     if (isAuthPage) {

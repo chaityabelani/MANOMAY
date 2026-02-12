@@ -160,7 +160,7 @@ export default function SignupPage() {
                             {/* Vendor Signup Link */}
                             <div className="mt-4 text-center">
                                 <Link
-                                    href="/vendor/signup"
+                                    href="/vendor-signup"
                                     className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
                                 >
                                     <span>Want to become a vendor?</span>

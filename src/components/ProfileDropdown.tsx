@@ -23,7 +23,7 @@ export default function ProfileDropdown({ userName, userEmail, userRole }: Profi
         if (result.success) {
             // Redirect to appropriate login page based on role
             if (userRole === 'vendor') {
-                router.push('/vendor/login');
+                router.push('/vendor-login');
             } else {
                 router.push('/login');
             }

@@ -116,7 +116,7 @@ export default function LoginPage() {
                     {/* Vendor Login Link */}
                     <div className="mt-4 text-center animate-slide-up" style={{ animationDelay: '0.3s' }}>
                         <Link
-                            href="/vendor/login"
+                            href="/vendor-login"
                             className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
                         >
                             <span>Are you a vendor?</span>
