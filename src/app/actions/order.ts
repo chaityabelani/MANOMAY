@@ -48,7 +48,7 @@ export async function createOrder(data: CreateOrderData) {
             );
 
             const order = await Order.create({
-                parkId: data.parkId || null,
+                parkId: data.parkId || undefined,
                 shopId,
                 tableNumber,
                 customerName,
