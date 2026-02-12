@@ -49,6 +49,11 @@ export async function saveBulkProducts(products: { name: string; price: number; 
 
         const shop = await getVendorShop(session.user.userId);
 
+        // Null safety check
+        if (!shop) {
+            return { success: false, error: 'Shop not found. Please contact support.' };
+        }
+
         const productDocs = products.map(p => ({
             shopId: shop._id,
             name: p.name,
@@ -81,6 +86,10 @@ export async function createProduct(formData: FormData) {
 
         const shop = await getVendorShop(session.user.userId);
 
+        if (!shop) {
+            return { success: false, error: 'Shop not found. Please contact support.' };
+        }
+
         const product = await Product.create({
             shopId: shop._id,
             name: formData.get('name'),
@@ -111,6 +120,11 @@ export async function getVendorProducts() {
         }
 
         const shop = await getVendorShop(session.user.userId);
+
+        if (!shop) {
+            return { success: false, error: 'Shop not found', products: [] };
+        }
+
         const products = await Product.find({ shopId: shop._id }).sort({ createdAt: -1 }).lean();
 
         return {
