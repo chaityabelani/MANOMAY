@@ -1,6 +1,10 @@
+import { getSession } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 import { getVendorProducts } from '@/app/actions/product';
 import Link from 'next/link';
 import ProductList from './ProductList';
+
+export const dynamic = 'force-dynamic';
 
 export default async function VendorProductsPage() {
     const result = await getVendorProducts();

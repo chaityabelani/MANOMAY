@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation';
 import { getShopOrders } from '@/app/actions/order';
 import OrderList from './OrderList';
 
+export const dynamic = 'force-dynamic';
+
 export default async function VendorOrdersPage() {
     const session = await getSession();
 
