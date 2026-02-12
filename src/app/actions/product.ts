@@ -90,14 +90,32 @@ export async function createProduct(formData: FormData) {
             return { success: false, error: 'Shop not found. Please contact support.' };
         }
 
+        // Extract and validate form data
+        const name = formData.get('name') as string;
+        const description = formData.get('description') as string;
+        const priceStr = formData.get('price') as string;
+        const category = (formData.get('category') as string) || 'General';
+        const image = (formData.get('image') as string) || '';
+        const isVeg = formData.get('isVeg') === 'true';
+
+        // Validation
+        if (!name || !description || !priceStr) {
+            return { success: false, error: 'Missing required fields' };
+        }
+
+        const price = Number(priceStr);
+        if (isNaN(price) || price < 0) {
+            return { success: false, error: 'Invalid price' };
+        }
+
         const product = await Product.create({
             shopId: shop._id,
-            name: formData.get('name'),
-            description: formData.get('description'),
-            price: Number(formData.get('price')),
-            category: formData.get('category') || 'General',
-            image: formData.get('image') || '',
-            isVeg: formData.get('isVeg') === 'true',
+            name,
+            description,
+            price,
+            category,
+            image,
+            isVeg,
             isAvailable: true,
         });
 
