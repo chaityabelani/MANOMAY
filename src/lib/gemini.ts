@@ -1,15 +1,19 @@
-
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const apiKey = process.env.GOOGLE_API_KEY;
+/**
+ * Lazy-loaded Gemini model getter
+ * Only checks for API key when actually needed (runtime), not during build
+ */
+export const getGeminiModel = () => {
+    const apiKey = process.env.GOOGLE_API_KEY;
 
-if (!apiKey) {
-    throw new Error("GOOGLE_API_KEY is not defined in environment variables");
-}
+    if (!apiKey) {
+        throw new Error("GOOGLE_API_KEY is not defined in environment variables");
+    }
 
-const genAI = new GoogleGenerativeAI(apiKey);
-
-export const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const genAI = new GoogleGenerativeAI(apiKey);
+    return genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+};
 
 export async function fileToGenerativePart(path: string, mimeType: string) {
     const fs = require("fs");

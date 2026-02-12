@@ -1,6 +1,6 @@
 'use server';
 
-import { model } from '@/lib/gemini';
+import { getGeminiModel } from '@/lib/gemini';
 import { getSession } from './auth';
 import Product from '@/models/Product';
 import Shop from '@/models/Shop';
@@ -64,7 +64,8 @@ Example output:
 ]
     `;
 
-        // Call Gemini API
+        // Call Gemini API (lazy load model at runtime)
+        const model = getGeminiModel();
         const result = await model.generateContent([prompt, imagePart]);
         const response = await result.response;
         const text = response.text();
