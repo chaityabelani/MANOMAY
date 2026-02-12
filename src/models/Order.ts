@@ -11,8 +11,11 @@ export interface IOrderItem {
 
 export interface IOrder extends Document {
     parkId?: mongoose.Types.ObjectId;
-    tableNumber?: string;
+    shopId: mongoose.Types.ObjectId; // Each order belongs to ONE shop
+    tableNumber: string;
     userId?: mongoose.Types.ObjectId;
+    customerName: string;
+    customerPhone: string;
     items: IOrderItem[];
     totalAmount: number;
     status: 'placed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
@@ -45,12 +48,27 @@ const OrderSchema: Schema<IOrder> = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'FoodPark',
         },
+        shopId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Shop',
+            required: true,
+            index: true,
+        },
         tableNumber: {
             type: String,
+            required: true,
         },
         userId: {
             type: Schema.Types.ObjectId,
             ref: 'User',
+        },
+        customerName: {
+            type: String,
+            required: true,
+        },
+        customerPhone: {
+            type: String,
+            required: true,
         },
         items: [OrderItemSchema],
         totalAmount: {
