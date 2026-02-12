@@ -54,8 +54,11 @@ export async function saveBulkProducts(products: { name: string; price: number; 
             return { success: false, error: 'Shop not found. Please contact support.' };
         }
 
+        // Extract the ID here, OUTSIDE the .map() function
+        const shopId = shop._id;
+
         const productDocs = products.map(p => ({
-            shopId: shop._id,
+            shopId: shopId,
             name: p.name,
             description: p.description,
             price: p.price,
