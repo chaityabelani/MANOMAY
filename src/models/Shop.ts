@@ -3,7 +3,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export interface IShop extends Document {
     name: string;
     description?: string;
-    parkId: mongoose.Types.ObjectId;
+    parkId?: mongoose.Types.ObjectId | null; // Optional - assigned by super admin later
     ownerId: mongoose.Types.ObjectId;
     cuisineType: string[];
     logo?: string;
@@ -26,7 +26,7 @@ const ShopSchema: Schema<IShop> = new Schema(
         parkId: {
             type: Schema.Types.ObjectId,
             ref: 'FoodPark',
-            required: true,
+            required: false, // Optional - will be assigned by super admin later
             index: true,
         },
         ownerId: {
