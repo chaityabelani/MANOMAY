@@ -22,12 +22,26 @@ export default function HomePage() {
                                 MANOMAY
                             </h1>
                         </div>
-                        <Link
-                            href="/vendor/login"
-                            className="px-6 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium transition backdrop-blur-sm border border-white/20"
-                        >
-                            Vendor Portal
-                        </Link>
+                        <div className="flex items-center gap-3">
+                            <Link
+                                href="/customer/login"
+                                className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition backdrop-blur-sm border border-white/20"
+                            >
+                                Customer Login
+                            </Link>
+                            <Link
+                                href="/vendor/login"
+                                className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition backdrop-blur-sm border border-white/20"
+                            >
+                                Vendor Login
+                            </Link>
+                            <Link
+                                href="/admin/login"
+                                className="px-4 py-2 rounded-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium transition"
+                            >
+                                👑 Admin
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </nav>
@@ -66,6 +80,13 @@ export default function HomePage() {
                                 <span>Explore Menu</span>
                                 <Zap className="w-5 h-5 animate-pulse" />
                             </div>
+                        </Link>
+                        <Link
+                            href="/customer/signup"
+                            className="px-8 py-4 rounded-2xl backdrop-blur-sm bg-white/10 hover:bg-white/20 border-2 border-white/30 text-white font-bold text-lg transition flex items-center gap-3 justify-center"
+                        >
+                            <Users className="w-6 h-6" />
+                            <span>Sign Up as Customer</span>
                         </Link>
                         <Link
                             href="/vendor/signup"
