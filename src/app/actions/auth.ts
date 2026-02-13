@@ -92,6 +92,7 @@ export async function vendorLogin(formData: FormData) {
         const token = createToken({
             userId: user._id.toString(),
             email: user.email,
+            name: user.name,
             role: user.role,
             shopId: user.shopId?.toString(),
         });
