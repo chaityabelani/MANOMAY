@@ -38,8 +38,8 @@ export default function AnalyticsPage() {
             setError('');
             const result = await getPlatformAnalytics();
 
-            if (result.success) {
-                setAnalytics(result.analytics);
+            if (result.success && result.analytics) {
+                setAnalytics(result.analytics as Analytics);
             } else {
                 setError(result.error || 'Failed to load analytics');
             }
