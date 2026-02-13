@@ -43,6 +43,7 @@ export async function customerSignup(formData: FormData) {
         const token = createToken({
             userId: user._id.toString(),
             email: user.email,
+            name: user.name,
             role: user.role,
         });
 
@@ -86,6 +87,7 @@ export async function customerLogin(formData: FormData) {
         const token = createToken({
             userId: user._id.toString(),
             email: user.email,
+            name: user.name,
             role: user.role,
         });
 

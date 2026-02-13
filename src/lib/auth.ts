@@ -7,6 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-change-in-producti
 export interface JWTPayload {
     userId: string;
     email: string;
+    name: string;
     role: 'super-admin' | 'vendor' | 'customer';
     shopId?: string;
 }
