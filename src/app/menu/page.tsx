@@ -1,120 +1,248 @@
-import { Suspense } from 'react';
-import connectDB from '@/lib/db';
-import Shop from '@/models/Shop';
-import Product from '@/models/Product';
+'use client';
+
+import { useEffect, useState, useCallback } from 'react';
+import { searchProducts, getCategories } from '@/app/actions/search';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Search, Filter, X } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
-export default async function MenuPage({
-    searchParams,
-}: {
-    searchParams: { table?: string };
-}) {
-    await connectDB();
+type Product = {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    category: string;
+    image: string;
+    isAvailable: boolean;
+    shopId: string;
+    shopName: string;
+};
 
-    const tableNumber = searchParams.table || '1';
+export default function MenuPage() {
+    const searchParams = useSearchParams();
+    const tableNumber = searchParams.get('table') || '1';
 
-    // Fetch all active shops (in a real app, filter by parkId)
-    const shops = await Shop.find({ isActive: true }).limit(20).lean();
+    const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<string[]>(['all']);
+    const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('all');
+    const [showFilters, setShowFilters] = useState(false);
+    const [availableOnly, setAvailableOnly] = useState(true);
 
-    // Get sample products for each shop
-    const shopIds = shops.map(s => s._id);
-    const products = await Product.find({
-        shopId: { $in: shopIds },
-        isAvailable: true
-    }).limit(100).lean();
+    // Debounced search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            loadProducts();
+        }, 300); // 300ms debounce
 
-    // Group products by shop
-    const productsByShop = products.reduce((acc: any, product: any) => {
-        const shopId = product.shopId.toString();
-        if (!acc[shopId]) acc[shopId] = [];
-        acc[shopId].push(product);
-        return acc;
-    }, {});
+        return () => clearTimeout(timer);
+    }, [searchQuery, selectedCategory, availableOnly]);
+
+    // Load categories on mount
+    useEffect(() => {
+        loadCategories();
+        loadProducts();
+    }, []);
+
+    async function loadCategories() {
+        const result = await getCategories();
+        if (result.success) {
+            setCategories(result.categories);
+        }
+    }
+
+    async function loadProducts() {
+        try {
+            setLoading(true);
+            const result = await searchProducts(searchQuery, {
+                category: selectedCategory,
+                availableOnly,
+            });
+
+            if (result.success) {
+                setProducts(result.products);
+            }
+        } catch (err) {
+            console.error('Load products error:', err);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    function clearFilters() {
+        setSearchQuery('');
+        setSelectedCategory('all');
+        setAvailableOnly(true);
+    }
+
+    const hasActiveFilters = searchQuery || selectedCategory !== 'all' || !availableOnly;
 
     return (
         <div className="min-h-screen bg-slate-50">
             {/* Header */}
-            <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
+            <header className="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
                 <div className="container mx-auto px-4 py-4">
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center mb-3">
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900">Manomay Food Court</h1>
                             <p className="text-sm text-slate-600">Table #{tableNumber}</p>
                         </div>
                         <Link
                             href="/cart"
-                            className="relative px-4 py-2 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-700 transition"
+                            className="px-4 py-2 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-700 transition"
                         >
                             🛒 Cart
                         </Link>
                     </div>
+
+                    {/* Search Bar */}
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <input
+                            type="text"
+                            placeholder="Search for food..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-10 pr-12 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        />
+                        <button
+                            onClick={() => setShowFilters(!showFilters)}
+                            className={`absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition ${showFilters ? 'bg-orange-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                }`}
+                        >
+                            <Filter className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    {/* Filters */}
+                    {showFilters && (
+                        <div className="mt-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <div className="flex flex-wrap gap-3">
+                                {/* Category Filter */}
+                                <div className="flex-1 min-w-[200px]">
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+                                    <select
+                                        value={selectedCategory}
+                                        onChange={(e) => setSelectedCategory(e.target.value)}
+                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                                    >
+                                        {categories.map((cat) => (
+                                            <option key={cat} value={cat}>
+                                                {cat === 'all' ? 'All Categories' : cat}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Available Only Filter */}
+                                <div className="flex items-end">
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={availableOnly}
+                                            onChange={(e) => setAvailableOnly(e.target.checked)}
+                                            className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                                        />
+                                        <span className="text-sm font-medium text-slate-700">Available only</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            {/* Clear Filters */}
+                            {hasActiveFilters && (
+                                <button
+                                    onClick={clearFilters}
+                                    className="mt-3 text-sm text-orange-600 hover:text-orange-700 font-medium flex items-center gap-1"
+                                >
+                                    <X className="w-4 h-4" />
+                                    Clear all filters
+                                </button>
+                            )}
+                        </div>
+                    )}
                 </div>
             </header>
 
             <main className="container mx-auto px-4 py-8">
-                {/* Welcome Section */}
-                <div className="bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-3xl p-8 mb-8">
-                    <h2 className="text-3xl font-bold mb-2">
-                        Welcome! 👋
-                    </h2>
-                    <p className="text-orange-100">
-                        Order from multiple shops in one cart. Food delivered to your table!
+                {/* Results Header */}
+                <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-2xl font-bold text-slate-900">
+                        {searchQuery ? `Results for "${searchQuery}"` : 'All Products'}
+                    </h3>
+                    <p className="text-slate-600">
+                        {products.length} {products.length === 1 ? 'item' : 'items'} found
                     </p>
                 </div>
 
-                {/* Shops Grid */}
-                <h3 className="text-2xl font-bold text-slate-900 mb-6">Browse Shops</h3>
-
-                {shops.length === 0 ? (
+                {/* Loading State */}
+                {loading ? (
                     <div className="text-center py-12">
-                        <p className="text-slate-600">No shops available at the moment.</p>
+                        <div className="animate-spin w-12 h-12 border-4 border-orange-600 border-t-transparent rounded-full mx-auto"></div>
+                        <p className="text-slate-600 mt-4">Searching...</p>
+                    </div>
+                ) : products.length === 0 ? (
+                    <div className="text-center py-12 bg-white rounded-3xl border border-slate-200">
+                        <div className="text-6xl mb-4">🔍</div>
+                        <h3 className="text-2xl font-bold text-slate-900 mb-2">No products found</h3>
+                        <p className="text-slate-600 mb-4">
+                            {searchQuery ? 'Try a different search term or adjust filters' : 'No products available'}
+                        </p>
+                        {hasActiveFilters && (
+                            <button
+                                onClick={clearFilters}
+                                className="px-6 py-2 bg-orange-600 text-white rounded-xl font-medium hover:bg-orange-700"
+                            >
+                                Clear filters
+                            </button>
+                        )}
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {shops.map((shop: any) => {
-                            const shopProducts = productsByShop[shop._id.toString()] || [];
-                            const sampleProduct = shopProducts[0];
-
-                            return (
-                                <Link
-                                    key={shop._id.toString()}
-                                    href={`/shop/${shop._id.toString()}?table=${tableNumber}`}
-                                    className="bg-white rounded-2xl overflow-hidden border border-slate-200 hover:shadow-xl transition group"
-                                >
-                                    {/* Shop Image/Banner */}
-                                    <div className="relative h-48 bg-gradient-to-br from-orange-100 to-orange-200">
-                                        {sampleProduct?.image && (
-                                            <Image
-                                                src={sampleProduct.image}
-                                                alt={shop.name}
-                                                fill
-                                                className="object-cover group-hover:scale-105 transition-transform duration-300"
-                                            />
-                                        )}
-                                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition"></div>
-                                    </div>
-
-                                    {/* Shop Info */}
-                                    <div className="p-5">
-                                        <h4 className="text-xl font-bold text-slate-900 mb-2">
-                                            {shop.name}
-                                        </h4>
-                                        <p className="text-sm text-slate-600 mb-3 line-clamp-2">
-                                            {shop.description || 'Delicious food awaits!'}
-                                        </p>
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-sm text-slate-500">
-                                                {shopProducts.length} items
-                                            </span>
-                                            <span className="text-orange-600 font-bold group-hover:translate-x-1 transition-transform inline-block">
-                                                Browse →
+                        {products.map((product) => (
+                            <div
+                                key={product.id}
+                                className="bg-white rounded-2xl overflow-hidden border border-slate-200 hover:shadow-xl transition"
+                            >
+                                {/* Product Image */}
+                                <div className="relative h-48 bg-gradient-to-br from-orange-100 to-orange-200">
+                                    {product.image && (
+                                        <Image
+                                            src={product.image}
+                                            alt={product.name}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    )}
+                                    {!product.isAvailable && (
+                                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                            <span className="bg-red-600 text-white px-4 py-2 rounded-full font-bold">
+                                                Unavailable
                                             </span>
                                         </div>
+                                    )}
+                                </div>
+
+                                {/* Product Info */}
+                                <div className="p-5">
+                                    <div className="flex items-start justify-between mb-2">
+                                        <h4 className="text-lg font-bold text-slate-900">{product.name}</h4>
+                                        <span className="text-lg font-bold text-orange-600">₹{product.price}</span>
                                     </div>
-                                </Link>
-                            );
-                        })}
+                                    <p className="text-sm text-slate-600 mb-3 line-clamp-2">{product.description}</p>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs text-slate-500">{product.shopName}</span>
+                                        <Link
+                                            href={`/shop/${product.shopId}?table=${tableNumber}`}
+                                            className="text-sm text-orange-600 hover:text-orange-700 font-medium"
+                                        >
+                                            View Shop →
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 )}
             </main>
