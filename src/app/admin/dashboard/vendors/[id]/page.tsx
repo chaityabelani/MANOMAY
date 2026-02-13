@@ -13,7 +13,6 @@ type VendorDetails = {
     shop: {
         id: string;
         name: string;
-        category: string;
         active: boolean;
         products: number;
         totalOrders: number;

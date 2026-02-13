@@ -73,7 +73,6 @@ export async function getAllVendorsWithShops() {
                         shop: shop ? {
                             id: shop._id.toString(),
                             name: shop.name || 'Unnamed Shop',
-                            category: shop.category || 'Other',
                             active: shop.active ?? false,
                             productCount,
                             orderCount,
@@ -168,7 +167,6 @@ export async function getVendorDetails(vendorId: string) {
                 shop: {
                     id: shop._id.toString(),
                     name: shop.name,
-                    category: shop.category,
                     active: shop.active ?? false,
                     products: products.length,
                     totalOrders: orders.length,

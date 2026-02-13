@@ -13,7 +13,6 @@ type Vendor = {
     shop: {
         id: string;
         name: string;
-        category: string;
         active: boolean;
         productCount: number;
         orderCount: number;
@@ -175,8 +174,8 @@ export default function VendorsPage() {
                                                 onClick={() => handleToggleStatus(vendor.id, vendor.shop!.active)}
                                                 disabled={updating === vendor.id}
                                                 className={`px-4 py-2 rounded-xl font-medium transition ${vendor.shop.active
-                                                        ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                                                        : 'bg-green-100 text-green-700 hover:bg-green-200'
+                                                    ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                                                    : 'bg-green-100 text-green-700 hover:bg-green-200'
                                                     } disabled:opacity-50`}
                                             >
                                                 {updating === vendor.id
