@@ -73,7 +73,7 @@ export async function getAllVendorsWithShops() {
                         shop: shop ? {
                             id: shop._id.toString(),
                             name: shop.name || 'Unnamed Shop',
-                            active: shop.active ?? false,
+                            active: shop.isActive ?? false,
                             productCount,
                             orderCount,
                         } : null,
@@ -167,7 +167,7 @@ export async function getVendorDetails(vendorId: string) {
                 shop: {
                     id: shop._id.toString(),
                     name: shop.name,
-                    active: shop.active ?? false,
+                    active: shop.isActive ?? false,
                     products: products.length,
                     totalOrders: orders.length,
                     totalRevenue,
@@ -176,7 +176,7 @@ export async function getVendorDetails(vendorId: string) {
                     id: p._id.toString(),
                     name: p.name,
                     price: p.price || 0,
-                    available: p.available ?? false,
+                    available: p.isAvailable ?? false,
                 })),
                 recentOrders: orders.map(o => ({
                     id: o._id.toString(),
@@ -314,7 +314,7 @@ export async function toggleVendorStatus(vendorId: string, active: boolean) {
 
         const shop = await Shop.findOneAndUpdate(
             { ownerId: vendorId },
-            { active },
+            { isActive: active },
             { new: true }
         );
 
