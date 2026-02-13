@@ -50,8 +50,8 @@ export default function VendorDetailsPage() {
             setError('');
             const result = await getVendorDetails(vendorId);
 
-            if (result.success) {
-                setVendor(result.vendor);
+            if (result.success && result.vendor) {
+                setVendor(result.vendor as VendorDetails);
             } else {
                 setError(result.error || 'Failed to load vendor details');
             }
