@@ -4,7 +4,7 @@ import connectDB from '@/lib/db';
 import User from '@/models/User';
 import Order from '@/models/Order';
 import { hash } from 'bcryptjs';
-import { createSession, getSession } from '@/lib/auth';
+import { createToken, setAuthCookie, getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
 /**
@@ -39,13 +39,14 @@ export async function customerSignup(formData: FormData) {
             role: 'customer',
         });
 
-        // Create session
-        await createSession({
+        // Create token and set cookie
+        const token = createToken({
             userId: user._id.toString(),
             email: user.email,
-            name: user.name,
             role: user.role,
         });
+
+        await setAuthCookie(token);
 
         return { success: true };
     } catch (error: any) {
@@ -81,12 +82,14 @@ export async function customerLogin(formData: FormData) {
             return { success: false, error: 'Invalid credentials' };
         }
 
-        await createSession({
+        // Create token and set cookie
+        const token = createToken({
             userId: user._id.toString(),
             email: user.email,
-            name: user.name,
             role: user.role,
         });
+
+        await setAuthCookie(token);
 
         return { success: true };
     } catch (error: any) {
