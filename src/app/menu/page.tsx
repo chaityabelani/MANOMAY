@@ -91,7 +91,7 @@ function MenuContent() {
                         </div>
                         <Link
                             href="/cart"
-                            className="px-4 py-2 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-700 transition"
+                            className="px-4 py-2 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-500 transition shadow-lg"
                         >
                             🛒 Cart
                         </Link>
@@ -179,7 +179,7 @@ function MenuContent() {
                 {/* Loading State */}
                 {loading ? (
                     <div className="text-center py-12">
-                        <div className="animate-spin w-12 h-12 border-4 border-orange-600 border-t-transparent rounded-full mx-auto"></div>
+                        <div className="animate-spin w-12 h-12 border-4 border-brand-600 border-t-transparent rounded-full mx-auto"></div>
                         <p className="text-slate-600 mt-4">Searching...</p>
                     </div>
                 ) : products.length === 0 ? (
@@ -192,7 +192,7 @@ function MenuContent() {
                         {hasActiveFilters && (
                             <button
                                 onClick={clearFilters}
-                                className="px-6 py-2 bg-orange-600 text-white rounded-xl font-medium hover:bg-orange-700"
+                                className="px-6 py-2 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-500 shadow-lg"
                             >
                                 Clear filters
                             </button>
@@ -228,7 +228,7 @@ function MenuContent() {
                                 <div className="p-5">
                                     <div className="flex items-start justify-between mb-2">
                                         <h4 className="text-lg font-bold text-slate-900">{product.name}</h4>
-                                        <span className="text-lg font-bold text-orange-600">₹{product.price}</span>
+                                        <span className="price-tag">₹{product.price}</span>
                                     </div>
                                     <p className="text-sm text-slate-600 mb-3 line-clamp-2">{product.description}</p>
                                     <div className="flex items-center justify-between">

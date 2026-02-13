@@ -6,7 +6,7 @@ export default function HomePage() {
         <div className="relative min-h-screen overflow-hidden bg-slate-950">
             {/* Animated Background */}
             <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-orange-500/20 via-purple-500/20 to-pink-500/20 blur-3xl animate-pulse"></div>
+                <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-brand-500/20 via-purple-500/20 to-pink-500/20 blur-3xl animate-pulse"></div>
                 <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-blue-500/20 via-cyan-500/20 to-teal-500/20 blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
             </div>
 
@@ -15,10 +15,10 @@ export default function HomePage() {
                 <div className="container mx-auto px-6 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-pink-500 rounded-xl flex items-center justify-center">
+                            <div className="w-10 h-10 bg-gradient-to-br from-brand-500 to-pink-500 rounded-xl flex items-center justify-center">
                                 <span className="text-2xl">🍽️</span>
                             </div>
-                            <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-brand-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
                                 MANOMAY
                             </h1>
                         </div>
@@ -37,7 +37,7 @@ export default function HomePage() {
                             </Link>
                             <Link
                                 href="/admin/login"
-                                className="px-4 py-2 rounded-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium transition"
+                                className="px-4 py-2 rounded-full bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium transition shadow-lg"
                             >
                                 👑 Admin
                             </Link>
@@ -52,11 +52,11 @@ export default function HomePage() {
                     {/* Main Headline */}
                     <div className="mb-8 animate-fade-in">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6">
-                            <Sparkles className="w-4 h-4 text-orange-400" />
+                            <Sparkles className="w-4 h-4 text-brand-400" />
                             <span className="text-sm text-white/90">India's First AI-Powered Digital Food Court</span>
                         </div>
                         <h1 className="text-7xl md:text-8xl font-black mb-6">
-                            <span className="bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-brand-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
                                 Order Food
                             </span>
                             <br />
@@ -74,7 +74,7 @@ export default function HomePage() {
                             href="/menu"
                             className="group relative px-8 py-4 rounded-2xl overflow-hidden"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 group-hover:scale-105 transition-transform"></div>
+                            <div className="absolute inset-0 bg-gradient-to-r from-brand-500 via-pink-500 to-purple-500 group-hover:scale-105 transition-transform"></div>
                             <div className="relative flex items-center gap-3 text-white font-bold text-lg">
                                 <ShoppingBag className="w-6 h-6" />
                                 <span>Explore Menu</span>
@@ -101,9 +101,9 @@ export default function HomePage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
                         {/* Card 1 */}
                         <div className="group relative">
-                            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-pink-500/20 rounded-3xl blur-xl group-hover:blur-2xl transition"></div>
+                            <div className="absolute inset-0 bg-gradient-to-br from-brand-500/20 to-pink-500/20 rounded-3xl blur-xl group-hover:blur-2xl transition"></div>
                             <div className="relative backdrop-blur-xl bg-white/10 rounded-3xl p-8 border border-white/20 hover:border-white/40 transition">
-                                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6">
+                                <div className="w-16 h-16 bg-gradient-to-br from-brand-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6">
                                     <QrCode className="w-8 h-8 text-white" />
                                 </div>
                                 <h3 className="text-2xl font-bold text-white mb-3">
@@ -174,8 +174,8 @@ export default function HomePage() {
 
                     {/* Vendor CTA Section */}
                     <div className="relative group">
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-3xl blur-2xl group-hover:blur-3xl transition opacity-50"></div>
-                        <div className="relative backdrop-blur-xl bg-gradient-to-r from-purple-900/50 to-orange-900/50 rounded-3xl p-12 border border-white/20">
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-brand-500 rounded-3xl blur-2xl group-hover:blur-3xl transition opacity-50"></div>
+                        <div className="relative backdrop-blur-xl bg-gradient-to-r from-purple-900/50 to-brand-900/50 rounded-3xl p-12 border border-white/20">
                             <div className="flex items-center gap-3 justify-center mb-4">
                                 <Users className="w-8 h-8 text-white" />
                                 <h2 className="text-4xl font-bold text-white">
