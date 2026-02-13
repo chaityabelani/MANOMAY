@@ -8,12 +8,24 @@ export default {
     theme: {
         extend: {
             colors: {
+                // Brand Color Palette - High-Contrast Orange for Food Apps
+                brand: {
+                    50: '#fff7ed',  // Light backgrounds
+                    100: '#ffedd5', // Accents
+                    500: '#f97316', // Decorative icons
+                    600: '#ea580c', // MAIN BUTTONS (Primary brand color)
+                    900: '#7c2d12', // Dark text on orange backgrounds
+                },
+                // Functional Aliases for easier usage
+                primary: '#ea580c',      // Orange-600
+                secondary: '#0f172a',    // Slate-900
                 // CSS Variable-based colors for shadcn/ui compatibility
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",
+                // Original primary/secondary (now aliased above, but keeping for shadcn consistency if needed)
                 primary: {
                     DEFAULT: "hsl(var(--primary))",
                     foreground: "hsl(var(--primary-foreground))",
