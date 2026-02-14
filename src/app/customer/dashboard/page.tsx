@@ -2,6 +2,7 @@ import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ShoppingBag, User, Clock } from 'lucide-react';
+import { logout } from '@/app/actions/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,13 +18,25 @@ export default async function CustomerDashboard() {
             {/* Header */}
             <header className="bg-white border-b border-slate-200">
                 <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-                    <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent">
-                        🍽️ MANOMAY
-                    </Link>
+                    {/* Logo with Logout Logic: Clicking navigates to home AND logs out user */}
+                    <form action={logout}>
+                        <button
+                            type="submit"
+                            className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent hover:opacity-80 transition cursor-pointer"
+                        >
+                            🍽️ MANOMAY
+                        </button>
+                    </form>
                     <div className="flex items-center gap-4">
                         <span className="text-sm text-slate-600">Hi, {session.user.name}</span>
-                        <form action="/api/logout" method="POST">
-                            <button className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900">
+                        <Link
+                            href="/customer/dashboard/profile"
+                            className="px-4 py-2 text-sm bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-medium"
+                        >
+                            Edit Profile
+                        </Link>
+                        <form action={logout}>
+                            <button className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900 font-medium">
                                 Logout
                             </button>
                         </form>
