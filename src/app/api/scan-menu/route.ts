@@ -24,11 +24,27 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Validate file type
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-        if (!validTypes.includes(file.type)) {
+        // Validate file type - check both MIME type and extension for reliability
+        const validMimeTypes = [
+            'image/jpeg',
+            'image/jpg',
+            'image/png',
+            'image/webp',
+            'application/pdf',  // Optional PDF support
+        ];
+
+        const validExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.pdf'];
+        const fileExtension = file.name.toLowerCase().match(/\.[^/.]+$/)?.[0];
+
+        const isValidMime = validMimeTypes.includes(file.type);
+        const isValidExtension = fileExtension && validExtensions.includes(fileExtension);
+
+        if (!isValidMime && !isValidExtension) {
             return NextResponse.json(
-                { error: 'Invalid file type. Please upload JPG, PNG, or WebP' },
+                {
+                    error: 'Invalid file type. Please upload an image (JPG, PNG, WebP) or PDF',
+                    details: `Received: ${file.type} (${file.name})`
+                },
                 { status: 400 }
             );
         }

@@ -18,11 +18,12 @@ export default async function VendorDashboard() {
                         <span className="text-sm text-slate-600">
                             {session?.user.email}
                         </span>
-                        <form action="/api/logout" method="POST">
-                            <button className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900">
-                                Logout
-                            </button>
-                        </form>
+                        <Link
+                            href="/vendor/dashboard/profile"
+                            className="px-4 py-2 text-sm bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-medium"
+                        >
+                            Profile
+                        </Link>
                     </div>
                 </div>
             </header>
