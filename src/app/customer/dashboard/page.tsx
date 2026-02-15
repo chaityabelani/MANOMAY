@@ -1,8 +1,8 @@
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { ShoppingBag, User, Clock } from 'lucide-react';
-import { logout } from '@/app/actions/auth';
+import { ShoppingBag, Clock } from 'lucide-react';
+import UserNotification from '@/components/UserNotification';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,41 +18,41 @@ export default async function CustomerDashboard() {
             {/* Header */}
             <header className="bg-white border-b border-slate-200">
                 <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-                    {/* Logo with Logout Logic: Clicking navigates to home AND logs out user */}
-                    <form action={logout}>
-                        <button
-                            type="submit"
-                            className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent hover:opacity-80 transition cursor-pointer"
-                        >
-                            🍽️ MANOMAY
-                        </button>
-                    </form>
+                    {/* Logo - Fixed: Now navigates to homepage instead of triggering logout */}
+                    <Link
+                        href="/customer/dashboard"
+                        className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent hover:opacity-80 transition cursor-pointer"
+                    >
+                        🍽️ MANOMAY
+                    </Link>
+
+                    {/* User Notification Component - Replaces static "Hi Customer" text */}
                     <div className="flex items-center gap-4">
-                        <span className="text-sm text-slate-600">Hi, {session.user.name}</span>
+                        <UserNotification
+                            userName={session.user.name}
+                            message="Welcome back!"
+                        />
+                        {/* Edit Profile button retained */}
                         <Link
                             href="/customer/dashboard/profile"
                             className="px-4 py-2 text-sm bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-medium"
                         >
                             Edit Profile
                         </Link>
-                        <form action={logout}>
-                            <button className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900 font-medium">
-                                Logout
-                            </button>
-                        </form>
+                        {/* Logout button REMOVED as per requirements */}
                     </div>
                 </div>
             </header>
 
             <div className="container mx-auto px-6 py-8">
-                {/* Welcome */}
+                {/* Welcome Banner */}
                 <div className="bg-gradient-to-r from-orange-600 to-pink-600 rounded-3xl p-8 mb-8 text-white">
                     <h2 className="text-3xl font-bold mb-2">Welcome back, {session.user.name}! 👋</h2>
                     <p className="text-orange-100">Track your orders and manage your account</p>
                 </div>
 
-                {/* Quick Actions */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                {/* Quick Actions - Profile section REMOVED */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <Link
                         href="/menu"
                         className="bg-white rounded-2xl p-6 border border-slate-200 hover:border-orange-300 hover:shadow-xl transition group"
@@ -76,19 +76,6 @@ export default async function CustomerDashboard() {
                         </h3>
                         <p className="text-slate-600 text-sm">
                             View your past orders
-                        </p>
-                    </Link>
-
-                    <Link
-                        href="/customer/dashboard/profile"
-                        className="bg-white rounded-2xl p-6 border border-slate-200 hover:border-purple-300 hover:shadow-xl transition group"
-                    >
-                        <User className="w-12 h-12 text-purple-600 mb-4" />
-                        <h3 className="font-bold text-xl mb-2 text-slate-900 group-hover:text-purple-600">
-                            Profile
-                        </h3>
-                        <p className="text-slate-600 text-sm">
-                            Manage your account details
                         </p>
                     </Link>
                 </div>
