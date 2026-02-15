@@ -56,6 +56,7 @@ export async function createOrder(data: CreateOrderData) {
                 customerPhone,
                 items: shopItems.map(item => ({
                     productId: item.productId,
+                    shopId: item.shopId,  // ← FIXED: Include shopId for each item
                     name: item.name,
                     price: item.price,
                     quantity: item.quantity,

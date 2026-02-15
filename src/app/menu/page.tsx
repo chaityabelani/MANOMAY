@@ -278,6 +278,12 @@ function MenuContent() {
                                                 href={`/shop/${product.shopId}?table=${tableNumber}`}
                                                 className="text-sm text-orange-600 hover:text-orange-700 font-medium"
                                                 onClick={(e) => {
+                                                    // Debug logging for logout investigation
+                                                    console.log('🏪 VIEW SHOP CLICKED');
+                                                    console.log('Product:', product);
+                                                    console.log('ShopId:', product.shopId);
+                                                    console.log('Table:', tableNumber);
+
                                                     // Validate shopId before navigation
                                                     if (!product.shopId || product.shopId === 'null' || product.shopId === 'undefined') {
                                                         e.preventDefault();
@@ -298,10 +304,10 @@ function MenuContent() {
                                                 onClick={() => handleAddToCart(product)}
                                                 disabled={!product.isAvailable}
                                                 className={`px-5 py-2 rounded-xl font-bold transition ${addedProduct === product.id
-                                                        ? 'bg-green-600 text-white'
-                                                        : product.isAvailable
-                                                            ? 'bg-orange-600 text-white hover:bg-orange-700'
-                                                            : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                                                    ? 'bg-green-600 text-white'
+                                                    : product.isAvailable
+                                                        ? 'bg-orange-600 text-white hover:bg-orange-700'
+                                                        : 'bg-slate-300 text-slate-500 cursor-not-allowed'
                                                     }`}
                                             >
                                                 {addedProduct === product.id ? '✓ Added!' : product.isAvailable ? '+ Add' : 'Unavailable'}

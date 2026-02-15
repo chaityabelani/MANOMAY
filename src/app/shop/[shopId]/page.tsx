@@ -13,12 +13,19 @@ export default async function ShopPage({
     searchParams: { table?: string };
 }) {
     try {
+        console.log('🏪 SHOP PAGE LOADING');
+        console.log('Params:', params);
+        console.log('ShopId:', params.shopId);
+
         await connectDB();
 
         const tableNumber = searchParams.table || '1';
         const shop = await Shop.findById(params.shopId).lean();
 
+        console.log('Shop Found:', shop ? `YES - ${shop.name}` : 'NO');
+
         if (!shop) {
+            console.error('❌ SHOP NOT FOUND - Returning 404');
             notFound();
         }
 
