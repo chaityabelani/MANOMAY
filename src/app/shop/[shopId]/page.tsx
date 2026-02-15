@@ -4,6 +4,7 @@ import Product from '@/models/Product';
 import Link from 'next/link';
 import ProductGrid from './ProductGrid';
 import { notFound } from 'next/navigation';
+import { getSession } from '@/lib/auth';
 
 export default async function ShopPage({
     params,
@@ -13,19 +14,15 @@ export default async function ShopPage({
     searchParams: { table?: string };
 }) {
     try {
-        console.log('🏪 SHOP PAGE LOADING');
-        console.log('Params:', params);
-        console.log('ShopId:', params.shopId);
-
         await connectDB();
+
+        // Fetch session to check if user is logged in
+        const session = await getSession();
 
         const tableNumber = searchParams.table || '1';
         const shop = await Shop.findById(params.shopId).lean();
 
-        console.log('Shop Found:', shop ? `YES - ${shop.name}` : 'NO');
-
         if (!shop) {
-            console.error('❌ SHOP NOT FOUND - Returning 404');
             notFound();
         }
 
@@ -39,28 +36,48 @@ export default async function ShopPage({
         return (
             <div className="min-h-screen bg-slate-50">
                 {/* Header */}
-                <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
+                <header className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
                     <div className="container mx-auto px-4 py-4">
                         <div className="flex items-center justify-between">
                             <Link
                                 href={`/menu?table=${tableNumber}`}
-                                className="text-slate-600 hover:text-slate-900 font-medium"
+                                className="text-slate-600 hover:text-slate-900 font-medium flex items-center gap-2"
                             >
-                                ← Back to Shops
+                                <span>←</span> Back
                             </Link>
-                            <Link
-                                href="/cart"
-                                className="px-4 py-2 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-700 transition"
-                            >
-                                🛒 Cart
-                            </Link>
+
+                            <div className="flex items-center gap-3">
+                                {/* Show user profile if logged in */}
+                                {session ? (
+                                    <Link
+                                        href={session.user.role === 'vendor' ? '/vendor/dashboard' : '/customer/dashboard'}
+                                        className="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-bold hover:bg-slate-200 transition text-sm"
+                                    >
+                                        👤 {session.user.name}
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        href="/customer/login"
+                                        className="px-4 py-2 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition text-sm"
+                                    >
+                                        Login
+                                    </Link>
+                                )}
+
+                                <Link
+                                    href="/cart"
+                                    className="px-4 py-2 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-700 transition shadow-md flex items-center gap-2"
+                                >
+                                    🛒 <span className="hidden sm:inline">Cart</span>
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </header>
 
                 <main className="container mx-auto px-4 py-8">
                     {/* Shop Header */}
-                    <div className="bg-white rounded-3xl p-8 mb-8 border border-slate-200">
+                    <div className="bg-white rounded-3xl p-8 mb-8 border border-slate-200 shadow-sm">
                         <h1 className="text-4xl font-bold text-slate-900 mb-2">{shop.name}</h1>
                         <p className="text-slate-600">{shop.description || 'Welcome to our shop!'}</p>
                         <div className="mt-4 flex gap-2 flex-wrap">
