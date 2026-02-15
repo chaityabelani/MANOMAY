@@ -1,6 +1,7 @@
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { logout } from '@/app/actions/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -73,6 +74,17 @@ export default async function CustomerProfilePage() {
                                     </span>
                                     <span className="text-slate-400 group-hover:text-red-600">→</span>
                                 </button>
+                                <form action={logout} className="w-full">
+                                    <button
+                                        type="submit"
+                                        className="w-full px-4 py-3 text-left rounded-xl border border-slate-200 hover:border-orange-300 hover:bg-orange-50 transition flex justify-between items-center group"
+                                    >
+                                        <span className="font-medium text-slate-900 group-hover:text-orange-600">
+                                            Logout
+                                        </span>
+                                        <span className="text-slate-400 group-hover:text-orange-600">→</span>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>

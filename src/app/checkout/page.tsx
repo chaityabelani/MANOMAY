@@ -134,13 +134,6 @@ export default function CheckoutPage() {
                                 placeholder="10-digit mobile number"
                             />
                         </div>
-
-                        <div className="bg-slate-50 rounded-xl p-4">
-                            <div className="flex items-center gap-2 text-sm text-slate-600">
-                                <span>📍</span>
-                                <span>Table #{tableNumber || '1'}</span>
-                            </div>
-                        </div>
                     </div>
 
                     <button

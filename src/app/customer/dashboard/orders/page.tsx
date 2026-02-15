@@ -48,7 +48,10 @@ export default function CustomerOrdersPage() {
             {/* Header */}
             <header className="bg-white border-b border-slate-200">
                 <div className="container mx-auto px-6 py-4">
-                    <Link href="/customer/dashboard" className="text-slate-600 hover:text-slate-900 text-sm">
+                    <Link
+                        href="/customer/dashboard"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-white rounded-2xl border border-slate-200 hover:border-orange-300 hover:shadow-xl transition font-bold text-slate-900 hover:text-orange-600"
+                    >
                         ← Back to Dashboard
                     </Link>
                 </div>

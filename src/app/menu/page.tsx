@@ -99,7 +99,6 @@ function MenuContent() {
                             <div className="border-l border-slate-300 h-6"></div>
                             <div>
                                 <h1 className="text-2xl font-bold text-slate-900">Manomay Food Court</h1>
-                                <p className="text-sm text-slate-600">Table #{tableNumber}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
