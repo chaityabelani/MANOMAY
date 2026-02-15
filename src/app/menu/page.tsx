@@ -8,6 +8,7 @@ import { Search, Filter, X, ArrowLeft } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import TableNumberInput from '@/components/TableNumberInput';
 import { useCartStore } from '@/store/useCartStore';
+import SafeNavigate from '@/components/SafeNavigate';
 
 type Product = {
     id: string;
@@ -280,12 +281,12 @@ function MenuContent() {
                                                     ID: {product.shopId || 'NULL/MISSING'}
                                                 </span>
                                             </div>
-                                            <Link
+                                            <SafeNavigate
                                                 href={`/shop/${product.shopId}?table=${tableNumber}`}
                                                 className="text-sm text-orange-600 hover:text-orange-700 font-medium transition"
                                             >
                                                 View Shop →
-                                            </Link>
+                                            </SafeNavigate>
                                         </div>
 
                                         {/* Quantity Controls */}
