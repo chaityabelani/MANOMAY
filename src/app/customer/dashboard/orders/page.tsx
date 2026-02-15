@@ -50,9 +50,9 @@ export default function CustomerOrdersPage() {
                 <div className="container mx-auto px-6 py-4">
                     <Link
                         href="/customer/dashboard"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-white rounded-2xl border border-slate-200 hover:border-orange-300 hover:shadow-xl transition font-bold text-slate-900 hover:text-orange-600"
+                        className="p-2 hover:bg-slate-100 rounded-lg transition flex items-center gap-1 text-slate-600 hover:text-slate-900 w-fit"
                     >
-                        ← Back to Dashboard
+                        <span className="text-sm font-medium">← Back to Dashboard</span>
                     </Link>
                 </div>
             </header>
