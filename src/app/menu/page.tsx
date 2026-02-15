@@ -276,8 +276,11 @@ function MenuContent() {
                                             <span className="text-xs text-slate-500">{product.shopName}</span>
                                             <button
                                                 onClick={() => {
+                                                    const targetUrl = `/shop/${product.shopId}?table=${tableNumber}`;
                                                     console.log('🏪 Navigating to shop:', product.shopId);
-                                                    router.push(`/shop/${product.shopId}?table=${tableNumber}`);
+                                                    console.log('Target URL:', targetUrl);
+                                                    // Use full page navigation to avoid client-side routing issues
+                                                    window.location.href = targetUrl;
                                                 }}
                                                 className="text-sm text-orange-600 hover:text-orange-700 font-medium transition"
                                             >
@@ -300,8 +303,8 @@ function MenuContent() {
                                                             onClick={() => handleAddToCart(product)}
                                                             disabled={!product.isAvailable}
                                                             className={`px-5 py-2 rounded-xl font-bold transition ${product.isAvailable
-                                                                    ? 'bg-orange-600 text-white hover:bg-orange-700'
-                                                                    : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                                                                ? 'bg-orange-600 text-white hover:bg-orange-700'
+                                                                : 'bg-slate-300 text-slate-500 cursor-not-allowed'
                                                                 }`}
                                                         >
                                                             + Add
