@@ -11,11 +11,11 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 
 /**
  * Get Gemini model for menu scanning
- * Using full model path to ensure v1 endpoint resolution
+ * Using gemini-1.5-flash-latest for v1beta compatibility
  */
 export function getGeminiModel() {
     return genAI.getGenerativeModel({
-        model: 'models/gemini-1.5-flash'
+        model: 'gemini-1.5-flash-latest'
     });
 }
 
