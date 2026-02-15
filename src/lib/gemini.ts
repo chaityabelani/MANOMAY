@@ -11,10 +11,10 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 
 /**
  * Get Gemini model for menu scanning
- * Using gemini-1.5-flash for fast, cost-effective vision tasks
+ * Using gemini-1.5-flash-001 (specific version) for reliable v1beta API compatibility
  */
 export function getGeminiModel() {
-    return genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    return genAI.getGenerativeModel({ model: 'gemini-1.5-flash-001' });
 }
 
 /**
