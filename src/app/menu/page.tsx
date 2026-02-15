@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { Search, Filter, X, ArrowLeft } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import TableNumberInput from '@/components/TableNumberInput';
+import { useCartStore } from '@/store/useCartStore';
 
 type Product = {
     id: string;
@@ -32,6 +33,27 @@ function MenuContent() {
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [showFilters, setShowFilters] = useState(false);
     const [availableOnly, setAvailableOnly] = useState(true);
+
+    // Cart functionality
+    const addToCart = useCartStore((state) => state.addToCart);
+    const [addedProduct, setAddedProduct] = useState<string | null>(null);
+
+    // Add to cart handler
+    function handleAddToCart(product: Product) {
+        addToCart({
+            productId: product.id,
+            shopId: product.shopId,
+            shopName: product.shopName,
+            name: product.name,
+            price: product.price,
+            image: product.image || '',
+            isVeg: false, // Default, can be enhanced
+        });
+
+        // Visual feedback
+        setAddedProduct(product.id);
+        setTimeout(() => setAddedProduct(null), 1500);
+    }
 
     // Debounced search
     useEffect(() => {
@@ -246,14 +268,45 @@ function MenuContent() {
                                         <span className="price-tag">₹{product.price}</span>
                                     </div>
                                     <p className="text-sm text-slate-600 mb-3 line-clamp-2">{product.description}</p>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs text-slate-500">{product.shopName}</span>
-                                        <Link
-                                            href={`/shop/${product.shopId}?table=${tableNumber}`}
-                                            className="text-sm text-orange-600 hover:text-orange-700 font-medium"
-                                        >
-                                            View Shop →
-                                        </Link>
+
+                                    {/* Enhanced Footer with Shop Link and Add to Cart */}
+                                    <div className="space-y-3">
+                                        {/* Shop Link */}
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs text-slate-500">{product.shopName}</span>
+                                            <Link
+                                                href={`/shop/${product.shopId}?table=${tableNumber}`}
+                                                className="text-sm text-orange-600 hover:text-orange-700 font-medium"
+                                                onClick={(e) => {
+                                                    // Validate shopId before navigation
+                                                    if (!product.shopId || product.shopId === 'null' || product.shopId === 'undefined') {
+                                                        e.preventDefault();
+                                                        alert('Shop information is not available for this product.');
+                                                    }
+                                                }}
+                                            >
+                                                View Shop →
+                                            </Link>
+                                        </div>
+
+                                        {/* Add to Cart Button */}
+                                        <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                                            <span className="text-xl font-bold text-orange-600">
+                                                ₹{product.price}
+                                            </span>
+                                            <button
+                                                onClick={() => handleAddToCart(product)}
+                                                disabled={!product.isAvailable}
+                                                className={`px-5 py-2 rounded-xl font-bold transition ${addedProduct === product.id
+                                                        ? 'bg-green-600 text-white'
+                                                        : product.isAvailable
+                                                            ? 'bg-orange-600 text-white hover:bg-orange-700'
+                                                            : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                                                    }`}
+                                            >
+                                                {addedProduct === product.id ? '✓ Added!' : product.isAvailable ? '+ Add' : 'Unavailable'}
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
