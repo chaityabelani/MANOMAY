@@ -35,7 +35,7 @@ function MenuContent() {
     const [availableOnly, setAvailableOnly] = useState(true);
 
     // Cart functionality
-    const addToCart = useCartStore((state) => state.addToCart);
+    const { items, addToCart, updateQuantity } = useCartStore();
     const [addedProduct, setAddedProduct] = useState<string | null>(null);
 
     // Add to cart handler
@@ -274,44 +274,64 @@ function MenuContent() {
                                         {/* Shop Link */}
                                         <div className="flex items-center justify-between">
                                             <span className="text-xs text-slate-500">{product.shopName}</span>
-                                            <Link
-                                                href={`/shop/${product.shopId}?table=${tableNumber}`}
-                                                className="text-sm text-orange-600 hover:text-orange-700 font-medium"
-                                                onClick={(e) => {
-                                                    // Debug logging for logout investigation
-                                                    console.log('🏪 VIEW SHOP CLICKED');
-                                                    console.log('Product:', product);
-                                                    console.log('ShopId:', product.shopId);
-                                                    console.log('Table:', tableNumber);
-
-                                                    // Validate shopId before navigation
-                                                    if (!product.shopId || product.shopId === 'null' || product.shopId === 'undefined') {
-                                                        e.preventDefault();
-                                                        alert('Shop information is not available for this product.');
-                                                    }
+                                            <button
+                                                onClick={() => {
+                                                    console.log('🏪 Navigating to shop:', product.shopId);
+                                                    router.push(`/shop/${product.shopId}?table=${tableNumber}`);
                                                 }}
+                                                className="text-sm text-orange-600 hover:text-orange-700 font-medium transition"
                                             >
                                                 View Shop →
-                                            </Link>
+                                            </button>
                                         </div>
 
-                                        {/* Add to Cart Button */}
+                                        {/* Quantity Controls */}
                                         <div className="flex items-center justify-between pt-2 border-t border-slate-100">
                                             <span className="text-xl font-bold text-orange-600">
                                                 ₹{product.price}
                                             </span>
-                                            <button
-                                                onClick={() => handleAddToCart(product)}
-                                                disabled={!product.isAvailable}
-                                                className={`px-5 py-2 rounded-xl font-bold transition ${addedProduct === product.id
-                                                    ? 'bg-green-600 text-white'
-                                                    : product.isAvailable
-                                                        ? 'bg-orange-600 text-white hover:bg-orange-700'
-                                                        : 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                                                    }`}
-                                            >
-                                                {addedProduct === product.id ? '✓ Added!' : product.isAvailable ? '+ Add' : 'Unavailable'}
-                                            </button>
+
+                                            {(() => {
+                                                const quantity = items.find(i => i.productId === product.id)?.quantity || 0;
+
+                                                if (quantity === 0) {
+                                                    return (
+                                                        <button
+                                                            onClick={() => handleAddToCart(product)}
+                                                            disabled={!product.isAvailable}
+                                                            className={`px-5 py-2 rounded-xl font-bold transition ${product.isAvailable
+                                                                    ? 'bg-orange-600 text-white hover:bg-orange-700'
+                                                                    : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                                                                }`}
+                                                        >
+                                                            + Add
+                                                        </button>
+                                                    );
+                                                } else {
+                                                    return (
+                                                        <div className="flex items-center gap-3">
+                                                            <button
+                                                                onClick={() => updateQuantity(product.id, quantity - 1)}
+                                                                className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold transition"
+                                                            >
+                                                                −
+                                                            </button>
+                                                            <span className="font-bold text-lg w-8 text-center">
+                                                                {quantity}
+                                                            </span>
+                                                            <button
+                                                                onClick={() => updateQuantity(product.id, quantity + 1)}
+                                                                className="w-8 h-8 rounded-lg bg-orange-100 hover:bg-orange-200 text-orange-700 font-bold transition"
+                                                            >
+                                                                +
+                                                            </button>
+                                                            <span className="ml-2 font-bold text-slate-900">
+                                                                ₹{product.price * quantity}
+                                                            </span>
+                                                        </div>
+                                                    );
+                                                }
+                                            })()}
                                         </div>
                                     </div>
                                 </div>
