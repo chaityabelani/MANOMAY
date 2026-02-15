@@ -273,19 +273,19 @@ function MenuContent() {
                                     <div className="space-y-3">
                                         {/* Shop Link */}
                                         <div className="flex items-center justify-between">
-                                            <span className="text-xs text-slate-500">{product.shopName}</span>
-                                            <button
-                                                onClick={() => {
-                                                    const targetUrl = `/shop/${product.shopId}?table=${tableNumber}`;
-                                                    console.log('🏪 Navigating to shop:', product.shopId);
-                                                    console.log('Target URL:', targetUrl);
-                                                    // Use full page navigation to avoid client-side routing issues
-                                                    window.location.href = targetUrl;
-                                                }}
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-xs text-slate-500">{product.shopName}</span>
+                                                {/* DEBUG: Show shopId */}
+                                                <span className="text-[10px] font-mono text-red-600">
+                                                    ID: {product.shopId || 'NULL/MISSING'}
+                                                </span>
+                                            </div>
+                                            <Link
+                                                href={`/shop/${product.shopId}?table=${tableNumber}`}
                                                 className="text-sm text-orange-600 hover:text-orange-700 font-medium transition"
                                             >
                                                 View Shop →
-                                            </button>
+                                            </Link>
                                         </div>
 
                                         {/* Quantity Controls */}
