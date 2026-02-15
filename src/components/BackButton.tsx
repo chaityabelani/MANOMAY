@@ -1,21 +1,5 @@
 import Link from 'next/link';
-
-/**
- * BackButton Component
- * 
- * A standardized, reusable back button component used across the application
- * for consistent navigation UI. Matches the design pattern established in the
- * Browse Menu page.
- * 
- * Features:
- * - Consistent styling across all pages
- * - Subtle hover effects (background fill)
- * - Accessible with proper semantic HTML
- * - Responsive padding and spacing
- * 
- * @param {string} href - The destination URL to navigate back to
- * @param {string} label - Optional custom label (defaults to "Back")
- */
+import { ArrowLeft } from 'lucide-react';
 
 interface BackButtonProps {
     href: string;
@@ -27,8 +11,10 @@ export default function BackButton({ href, label = "Back" }: BackButtonProps) {
         <Link
             href={href}
             className="p-2 hover:bg-slate-100 rounded-lg transition flex items-center gap-1 text-slate-600 hover:text-slate-900 w-fit"
+            aria-label="Go back"
         >
-            <span className="text-sm font-medium">← {label}</span>
+            <ArrowLeft className="w-5 h-5" />
+            <span className="text-sm font-medium">{label}</span>
         </Link>
     );
 }
