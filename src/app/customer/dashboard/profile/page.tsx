@@ -1,7 +1,7 @@
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
 import { logout } from '@/app/actions/auth';
+import BackButton from '@/components/BackButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,9 +17,7 @@ export default async function CustomerProfilePage() {
             {/* Header */}
             <header className="bg-white border-b border-slate-200">
                 <div className="container mx-auto px-6 py-4">
-                    <Link href="/customer/dashboard" className="text-slate-600 hover:text-slate-900 text-sm">
-                        ← Back to Dashboard
-                    </Link>
+                    <BackButton href="/customer/dashboard" />
                 </div>
             </header>
 

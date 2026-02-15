@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getCustomerOrders } from '@/app/actions/customer';
 import Link from 'next/link';
+import BackButton from '@/components/BackButton';
 
 type Order = {
     id: string;
@@ -48,12 +49,7 @@ export default function CustomerOrdersPage() {
             {/* Header */}
             <header className="bg-white border-b border-slate-200">
                 <div className="container mx-auto px-6 py-4">
-                    <Link
-                        href="/customer/dashboard"
-                        className="p-2 hover:bg-slate-100 rounded-lg transition flex items-center gap-1 text-slate-600 hover:text-slate-900 w-fit"
-                    >
-                        <span className="text-sm font-medium">← Back to Dashboard</span>
-                    </Link>
+                    <BackButton href="/customer/dashboard" />
                 </div>
             </header>
 
