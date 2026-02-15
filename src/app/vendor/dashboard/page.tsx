@@ -15,9 +15,7 @@ export default async function VendorDashboard() {
                         Vendor Dashboard
                     </h1>
                     <div className="flex items-center gap-4">
-                        <span className="text-sm text-slate-600">
-                            {session?.user.email}
-                        </span>
+
                         <Link
                             href="/vendor/dashboard/profile"
                             className="px-4 py-2 text-sm bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-medium"
