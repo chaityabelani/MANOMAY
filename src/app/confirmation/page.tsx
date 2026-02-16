@@ -29,12 +29,20 @@ export default function ConfirmationPage({
                 <div className="bg-white rounded-2xl p-6 mb-6 border-2 border-green-200">
                     <h2 className="font-bold text-slate-900 mb-3">Order Details</h2>
                     <div className="text-sm text-slate-600 space-y-2">
-                        <p>
-                            <span className="font-semibold">Orders Created:</span> {orderIds.length}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                            (Your items have been split across {orderIds.length} vendor{orderIds.length > 1 ? 's' : ''})
-                        </p>
+                        {orderIds.length > 0 ? (
+                            <>
+                                <p>
+                                    <span className="font-semibold">Order ID{orderIds.length > 1 ? 's' : ''}:</span> {orderIds.join(', ')}
+                                </p>
+                                <p className="text-xs text-slate-500">
+                                    Your order has been sent to the vendor{orderIds.length > 1 ? 's' : ''} and is being prepared
+                                </p>
+                            </>
+                        ) : (
+                            <p>
+                                <span className="font-semibold">Order Confirmed</span>
+                            </p>
+                        )}
                     </div>
                 </div>
 

@@ -38,7 +38,7 @@ export default async function VendorDashboard() {
                 </div>
 
                 {/* Quick Actions */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                     <Link
                         href="/vendor/dashboard/products/scan"
                         className="bg-white rounded-2xl p-6 border-2 border-dashed border-orange-300 hover:border-orange-500 hover:shadow-xl transition group"
@@ -62,6 +62,19 @@ export default async function VendorDashboard() {
                         </h3>
                         <p className="text-slate-600 text-sm">
                             Manage your existing menu items
+                        </p>
+                    </Link>
+
+                    <Link
+                        href="/vendor/dashboard/orders"
+                        className="bg-white rounded-2xl p-6 border border-slate-200 hover:border-orange-300 hover:shadow-xl transition group"
+                    >
+                        <div className="text-4xl mb-4">📋</div>
+                        <h3 className="font-bold text-xl mb-2 text-slate-900 group-hover:text-orange-600">
+                            Manage Orders
+                        </h3>
+                        <p className="text-slate-600 text-sm">
+                            View and manage incoming customer orders
                         </p>
                     </Link>
                 </div>
