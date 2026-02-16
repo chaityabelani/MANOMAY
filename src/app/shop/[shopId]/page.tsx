@@ -1,9 +1,11 @@
 import connectDB from '@/lib/db';
 import Shop from '@/models/Shop';
 import Product from '@/models/Product';
+import User from '@/models/User';
 import Link from 'next/link';
 import ProductGrid from './ProductGrid';
 import { notFound } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
 import { getSession } from '@/lib/auth';
 
 export default async function ShopPage(props: {
@@ -36,6 +38,10 @@ export default async function ShopPage(props: {
             notFound();
         }
 
+        // Fetch vendor/owner details
+        const vendor = shop.ownerId ? await User.findById(shop.ownerId).select('name').lean() : null;
+        const vendorName = vendor?.name || null;
+
         console.log('📦 [SHOP PAGE] Fetching products for shop...');
         const products = await Product.find({
             shopId: params.shopId,
@@ -54,9 +60,11 @@ export default async function ShopPage(props: {
                         <div className="flex items-center justify-between">
                             <Link
                                 href={`/menu?table=${tableNumber}`}
-                                className="text-slate-600 hover:text-slate-900 font-medium flex items-center gap-2"
+                                className="p-2 hover:bg-slate-100 rounded-lg transition flex items-center gap-1 text-slate-600 hover:text-slate-900"
+                                aria-label="Go back"
                             >
-                                <span>←</span> Back
+                                <ArrowLeft className="w-5 h-5" />
+                                <span className="text-sm font-medium">Back</span>
                             </Link>
 
                             <div className="flex items-center gap-3">
@@ -92,6 +100,9 @@ export default async function ShopPage(props: {
                     {/* Shop Header */}
                     <div className="bg-white rounded-3xl p-8 mb-8 border border-slate-200 shadow-sm">
                         <h1 className="text-4xl font-bold text-slate-900 mb-2">{shop.name}</h1>
+                        {vendorName && (
+                            <p className="text-sm text-slate-500 mb-3">by <span className="font-medium text-slate-700">{vendorName}</span></p>
+                        )}
                         <p className="text-slate-600">{shop.description || 'Welcome to our shop!'}</p>
                         <div className="mt-4 flex gap-2 flex-wrap">
                             {shop.cuisineType?.map((cuisine: string, index: number) => (
