@@ -1,10 +1,20 @@
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { getVendorStats } from '@/app/actions/product';
 
 export const dynamic = 'force-dynamic';
 export default async function VendorDashboard() {
     const session = await getSession();
+
+    // Fetch vendor stats
+    const statsResult = await getVendorStats();
+    const stats = statsResult.success && statsResult.stats ? statsResult.stats : {
+        totalProducts: 0,
+        activeProducts: 0,
+        ordersToday: 0,
+        revenueToday: 0
+    };
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -84,19 +94,19 @@ export default async function VendorDashboard() {
                     <h3 className="font-bold text-lg mb-4">Quick Stats</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
-                            <div className="text-3xl font-bold text-orange-600">0</div>
+                            <div className="text-3xl font-bold text-orange-600">{stats.totalProducts}</div>
                             <div className="text-sm text-slate-600">Total Products</div>
                         </div>
                         <div>
-                            <div className="text-3xl font-bold text-green-600">0</div>
+                            <div className="text-3xl font-bold text-green-600">{stats.activeProducts}</div>
                             <div className="text-sm text-slate-600">Active Products</div>
                         </div>
                         <div>
-                            <div className="text-3xl font-bold text-blue-600">0</div>
+                            <div className="text-3xl font-bold text-blue-600">{stats.ordersToday}</div>
                             <div className="text-sm text-slate-600">Orders Today</div>
                         </div>
                         <div>
-                            <div className="text-3xl font-bold text-purple-600">₹0</div>
+                            <div className="text-3xl font-bold text-purple-600">₹{stats.revenueToday}</div>
                             <div className="text-sm text-slate-600">Revenue Today</div>
                         </div>
                     </div>

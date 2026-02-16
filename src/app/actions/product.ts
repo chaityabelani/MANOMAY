@@ -38,6 +38,84 @@ async function getVendorShop(userId: string) {
 }
 
 /**
+ * Get vendor statistics for dashboard
+ */
+export async function getVendorStats() {
+    try {
+        const session = await getSession();
+        if (!session || session.user.role !== 'vendor') {
+            return {
+                success: false,
+                error: 'Unauthorized',
+                stats: null
+            };
+        }
+
+        await connectDB();
+        const shop = await getVendorShop(session.user.userId);
+
+        if (!shop) {
+            return {
+                success: false,
+                error: 'Shop not found',
+                stats: null
+            };
+        }
+
+        // Get product stats
+        const totalProducts = await Product.countDocuments({ shopId: shop._id });
+        const activeProducts = await Product.countDocuments({
+            shopId: shop._id,
+            isAvailable: true
+        });
+
+        // Get today's date range
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        // Import Order model
+        const Order = (await import('@/models/Order')).default;
+
+        // Get today's orders for this shop
+        const todaysOrders = await Order.find({
+            'items.shopId': shop._id,
+            createdAt: { $gte: today, $lt: tomorrow }
+        });
+
+        const ordersToday = todaysOrders.length;
+
+        // Calculate today's revenue
+        let revenueToday = 0;
+        todaysOrders.forEach(order => {
+            order.items.forEach((item: any) => {
+                if (item.shopId?.toString() === shop._id.toString()) {
+                    revenueToday += item.price * item.quantity;
+                }
+            });
+        });
+
+        return {
+            success: true,
+            stats: {
+                totalProducts,
+                activeProducts,
+                ordersToday,
+                revenueToday
+            }
+        };
+    } catch (error: any) {
+        console.error('Get vendor stats error:', error);
+        return {
+            success: false,
+            error: error.message,
+            stats: null
+        };
+    }
+}
+
+/**
  * Save scanned products (bulk)
  */
 export async function saveBulkProducts(products: { name: string; price: number; description: string }[]) {
