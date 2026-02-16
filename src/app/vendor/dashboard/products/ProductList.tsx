@@ -2,6 +2,7 @@
 
 import { toggleProductAvailability, deleteProduct } from '@/app/actions/product';
 import { useState } from 'react';
+import Link from 'next/link';
 
 interface Product {
     id: string;
@@ -77,6 +78,12 @@ export default function ProductList({ products }: { products: Product[] }) {
                         </div>
 
                         <div className="flex gap-2">
+                            <Link
+                                href={`/vendor/dashboard/products/edit/${product.id}`}
+                                className="flex-1 px-4 py-2 bg-blue-50 text-blue-600 font-bold rounded-xl hover:bg-blue-100 transition text-sm text-center"
+                            >
+                                ✏️ Edit
+                            </Link>
                             <button
                                 onClick={() => handleDelete(product.id, product.name)}
                                 className="flex-1 px-4 py-2 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition text-sm"

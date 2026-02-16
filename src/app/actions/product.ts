@@ -196,6 +196,98 @@ export async function toggleProductAvailability(productId: string) {
 }
 
 /**
+ * Get single product by ID (for editing)
+ */
+export async function getProductById(productId: string) {
+    try {
+        const session = await getSession();
+        if (!session || session.user.role !== 'vendor') {
+            return { success: false, error: 'Unauthorized', product: null };
+        }
+
+        await connectDB();
+        const product = await Product.findById(productId).lean();
+
+        if (!product) {
+            return { success: false, error: 'Product not found', product: null };
+        }
+
+        return {
+            success: true,
+            product: {
+                id: product._id.toString(),
+                name: product.name,
+                description: product.description,
+                price: product.price,
+                category: product.category,
+                image: product.image || '',
+                isVeg: product.isVeg,
+                isAvailable: product.isAvailable,
+            },
+        };
+    } catch (error: any) {
+        console.error('Get product error:', error);
+        return { success: false, error: error.message, product: null };
+    }
+}
+
+/**
+ * Update product
+ */
+export async function updateProduct(productId: string, formData: FormData) {
+    try {
+        const session = await getSession();
+        if (!session || session.user.role !== 'vendor') {
+            return { success: false, error: 'Unauthorized' };
+        }
+
+        await connectDB();
+
+        // Extract form data
+        const name = formData.get('name') as string;
+        const description = formData.get('description') as string;
+        const priceStr = formData.get('price') as string;
+        const category = (formData.get('category') as string) || 'General';
+        const image = (formData.get('image') as string) || '';
+        const isVeg = formData.get('isVeg') === 'true';
+
+        // Validation
+        if (!name || !description || !priceStr) {
+            return { success: false, error: 'Missing required fields' };
+        }
+
+        const price = Number(priceStr);
+        if (isNaN(price) || price < 0) {
+            return { success: false, error: 'Invalid price' };
+        }
+
+        // Update product
+        const product = await Product.findByIdAndUpdate(
+            productId,
+            {
+                name,
+                description,
+                price,
+                category,
+                image,
+                isVeg,
+            },
+            { new: true }
+        );
+
+        if (!product) {
+            return { success: false, error: 'Product not found' };
+        }
+
+        revalidatePath('/vendor/dashboard/products');
+        return { success: true, productId: product._id.toString() };
+    } catch (error: any) {
+        console.error('Update product error:', error);
+        return { success: false, error: error.message || 'Failed to update product' };
+    }
+}
+
+/**
  * Delete product
  */
 export async function deleteProduct(productId: string) {
