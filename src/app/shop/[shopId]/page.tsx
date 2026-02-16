@@ -13,25 +13,37 @@ export default async function ShopPage({
     params: { shopId: string };
     searchParams: { table?: string };
 }) {
+    console.log('🔍 [SHOP PAGE] Attempting to load shop:', params.shopId);
+
     try {
+        console.log('🔌 [SHOP PAGE] Connecting to database...');
         await connectDB();
+        console.log('✅ [SHOP PAGE] Database connected successfully');
 
         // Fetch session to check if user is logged in
         const session = await getSession();
 
         const tableNumber = searchParams.table || '1';
+
+        console.log('🔎 [SHOP PAGE] Looking up shop in database with ID:', params.shopId);
         const shop = await Shop.findById(params.shopId).lean();
 
+        console.log('🏪 [SHOP PAGE] Shop found:', shop ? `✅ ${shop.name}` : '❌ NOT FOUND');
+
         if (!shop) {
+            console.error('❌ [SHOP PAGE] Shop not found, triggering notFound()');
             notFound();
         }
 
+        console.log('📦 [SHOP PAGE] Fetching products for shop...');
         const products = await Product.find({
             shopId: params.shopId,
             isAvailable: true,
         })
             .sort({ createdAt: -1 })
             .lean();
+
+        console.log(`✅ [SHOP PAGE] Found ${products.length} products`);
 
         return (
             <div className="min-h-screen bg-slate-50">
@@ -115,24 +127,47 @@ export default async function ShopPage({
                 </main>
             </div>
         );
-    } catch (error) {
-        console.error('Shop page error:', error);
+    } catch (error: any) {
+        console.error('❌ [SHOP PAGE] Critical error:', error);
+        console.error('Stack trace:', error.stack);
+
+        const errorMessage = error.message || 'Unknown error';
+        const isDBError = errorMessage.includes('connect') || errorMessage.includes('ECONNREFUSED');
+
         return (
             <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
-                <div className="text-center bg-white rounded-3xl p-8 border border-slate-200 max-w-md">
-                    <div className="text-6xl mb-4">😕</div>
+                <div className="text-center bg-white rounded-3xl p-8 border border-red-200 max-w-2xl">
+                    <div className="text-6xl mb-4">{isDBError ? '🔌' : '😕'}</div>
                     <h1 className="text-2xl font-bold text-slate-900 mb-2">
-                        Unable to Load Shop
+                        {isDBError ? 'Database Connection Error' : 'Unable to Load Shop'}
                     </h1>
-                    <p className="text-slate-600 mb-6">
-                        There was an error loading this shop. Please try again or contact support.
+                    <p className="text-slate-600 mb-4">
+                        {isDBError
+                            ? 'Cannot connect to the database. Please check your connection.'
+                            : 'There was an error loading this shop.'}
                     </p>
-                    <Link
-                        href="/menu"
-                        className="inline-block px-6 py-3 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-700 transition"
-                    >
-                        ← Back to Menu
-                    </Link>
+                    <div className="bg-slate-100 rounded-lg p-4 mb-6 text-left">
+                        <p className="text-xs font-mono text-red-600 break-all">
+                            Error: {errorMessage}
+                        </p>
+                        <p className="text-xs text-slate-500 mt-2">
+                            Shop ID: {params.shopId}
+                        </p>
+                    </div>
+                    <div className="flex gap-3 justify-center">
+                        <Link
+                            href="/menu"
+                            className="px-6 py-3 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-700 transition"
+                        >
+                            ← Back to Menu
+                        </Link>
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="px-6 py-3 bg-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-300 transition"
+                        >
+                            🔄 Retry
+                        </button>
+                    </div>
                 </div>
             </div>
         );
