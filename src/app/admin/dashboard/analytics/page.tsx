@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { getPlatformAnalytics } from '@/app/actions/analytics';
 import Link from 'next/link';
 import { Store, Package, ShoppingCart, DollarSign, TrendingUp, AlertCircle } from 'lucide-react';
+import BackButton from '@/components/BackButton';
 
 type Analytics = {
     overview: {
@@ -55,9 +56,7 @@ export default function AnalyticsPage() {
         <div className="min-h-screen bg-slate-50">
             <header className="bg-white border-b border-slate-200">
                 <div className="container mx-auto px-6 py-4">
-                    <Link href="/admin/dashboard" className="text-slate-600 hover:text-slate-900 text-sm">
-                        ← Back to Dashboard
-                    </Link>
+                    <BackButton href="/admin/dashboard" label="Back to Dashboard" />
                 </div>
             </header>
 

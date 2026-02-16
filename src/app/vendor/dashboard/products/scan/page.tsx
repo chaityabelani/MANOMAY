@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { saveBulkProducts } from '@/app/actions/product';
+import BackButton from '@/components/BackButton';
 
 interface ScannedProduct {
     name: string;
@@ -84,12 +85,7 @@ export default function AIMenuScanner() {
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
-                    <button
-                        onClick={() => router.back()}
-                        className="text-slate-600 hover:text-slate-900 mb-4"
-                    >
-                        ← Back to Dashboard
-                    </button>
+                    <BackButton href="/vendor/dashboard" label="Back to Dashboard" />
                     <h1 className="text-4xl font-bold text-slate-900 mb-2">
                         AI Menu Scanner 📸
                     </h1>
