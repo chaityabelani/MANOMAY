@@ -4,31 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import BackButton from '@/components/BackButton';
 import { createProduct } from '@/app/actions/product';
-import { useUploadThing } from '@/lib/uploadthing';
 import { toast } from 'react-hot-toast';
 
 export default function AddProductPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imageBase64, setImageBase64] = useState<string>('');
     const [imagePreview, setImagePreview] = useState<string>('');
-    const [uploadProgress, setUploadProgress] = useState<number>(0);
-
-    const { startUpload, isUploading } = useUploadThing("productImage", {
-        onClientUploadComplete: (res) => {
-            console.log("Upload complete:", res);
-            setUploadProgress(100);
-        },
-        onUploadError: (error) => {
-            console.error("Upload error:", error);
-            toast.error(`Upload failed: ${error.message}`);
-            setLoading(false);
-        },
-        onUploadProgress: (progress) => {
-            setUploadProgress(progress);
-        },
-    });
 
     function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
@@ -41,18 +24,18 @@ export default function AddProductPage() {
             return;
         }
 
-        // Validate file size (max 4MB to match UploadThing config)
-        if (file.size > 4 * 1024 * 1024) {
-            toast.error('Image size must be less than 4MB');
+        // Validate file size (max 1MB for base64 storage)
+        if (file.size > 1 * 1024 * 1024) {
+            toast.error('Image size must be less than 1MB');
             return;
         }
 
-        setImageFile(file);
-
-        // Create preview
+        // Convert to base64
         const reader = new FileReader();
         reader.onloadend = () => {
-            setImagePreview(reader.result as string);
+            const base64String = reader.result as string;
+            setImageBase64(base64String);
+            setImagePreview(base64String);
         };
         reader.readAsDataURL(file);
     }
@@ -66,17 +49,9 @@ export default function AddProductPage() {
         try {
             const formData = new FormData(e.currentTarget);
 
-            // Upload image if selected
-            let imageUrl = '';
-            if (imageFile) {
-                const uploadResult = await startUpload([imageFile]);
-
-                if (!uploadResult || uploadResult.length === 0) {
-                    throw new Error('Image upload failed');
-                }
-
-                imageUrl = uploadResult[0].url;
-                formData.set('image', imageUrl);
+            // Add base64 image if selected
+            if (imageBase64) {
+                formData.set('image', imageBase64);
             }
 
             // Create product
@@ -113,7 +88,7 @@ export default function AddProductPage() {
                         {/* Product Image Upload */}
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Product Image
+                                Product Image (max 1MB)
                             </label>
                             <input
                                 type="file"
@@ -135,21 +110,6 @@ export default function AddProductPage() {
                                 </div>
                             )}
 
-                            {/* Upload Progress */}
-                            {isUploading && (
-                                <div className="mt-3">
-                                    <div className="flex justify-between text-sm text-slate-600 mb-1">
-                                        <span>Uploading image...</span>
-                                        <span>{uploadProgress}%</span>
-                                    </div>
-                                    <div className="w-full bg-slate-200 rounded-full h-2">
-                                        <div
-                                            className="bg-orange-600 h-2 rounded-full transition-all duration-300"
-                                            style={{ width: `${uploadProgress}%` }}
-                                        />
-                                    </div>
-                                </div>
-                            )}
                         </div>
 
                         {/* Product Name */}
@@ -242,10 +202,10 @@ export default function AddProductPage() {
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            disabled={loading || isUploading}
+                            disabled={loading}
                             className="w-full bg-gradient-to-r from-orange-600 to-orange-700 text-white font-bold py-4 rounded-2xl hover:shadow-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {loading ? (isUploading ? `Uploading... ${uploadProgress}%` : 'Adding Product...') : '✅ Add Product'}
+                            {loading ? 'Adding Product...' : '✅ Add Product'}
                         </button>
                     </div>
                 </form>
