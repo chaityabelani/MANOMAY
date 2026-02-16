@@ -6,13 +6,14 @@ import ProductGrid from './ProductGrid';
 import { notFound } from 'next/navigation';
 import { getSession } from '@/lib/auth';
 
-export default async function ShopPage({
-    params,
-    searchParams,
-}: {
-    params: { shopId: string };
-    searchParams: { table?: string };
+export default async function ShopPage(props: {
+    params: Promise<{ shopId: string }>;
+    searchParams: Promise<{ table?: string }>;
 }) {
+    // Await params in Next.js 15+
+    const params = await props.params;
+    const searchParams = await props.searchParams;
+
     console.log('🔍 [SHOP PAGE] Attempting to load shop:', params.shopId);
 
     try {
