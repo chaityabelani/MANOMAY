@@ -8,7 +8,6 @@ import { Search, Filter, X, ArrowLeft } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import TableNumberInput from '@/components/TableNumberInput';
 import { useCartStore } from '@/store/useCartStore';
-import SafeNavigate from '@/components/SafeNavigate';
 
 type Product = {
     id: string;
@@ -274,19 +273,13 @@ function MenuContent() {
                                     <div className="space-y-3">
                                         {/* Shop Link */}
                                         <div className="flex items-center justify-between">
-                                            <div className="flex flex-col gap-1">
-                                                <span className="text-xs text-slate-500">{product.shopName}</span>
-                                                {/* DEBUG: Show shopId */}
-                                                <span className="text-[10px] font-mono text-red-600">
-                                                    ID: {product.shopId || 'NULL/MISSING'}
-                                                </span>
-                                            </div>
-                                            <SafeNavigate
+                                            <span className="text-xs text-slate-500">{product.shopName}</span>
+                                            <Link
                                                 href={`/shop/${product.shopId}?table=${tableNumber}`}
-                                                className="text-sm text-orange-600 hover:text-orange-700 font-medium transition"
+                                                className="text-sm text-orange-600 hover:text-orange-700 font-medium transition hover:underline"
                                             >
                                                 View Shop →
-                                            </SafeNavigate>
+                                            </Link>
                                         </div>
 
                                         {/* Quantity Controls */}
