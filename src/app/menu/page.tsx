@@ -277,6 +277,19 @@ function MenuContent() {
                                             <Link
                                                 href={`/shop/${product.shopId}?table=${tableNumber}`}
                                                 className="text-sm text-orange-600 hover:text-orange-700 font-medium transition hover:underline"
+                                                onClick={(e) => {
+                                                    console.log('🔍 DEBUG: View Shop clicked');
+                                                    console.log('Product:', product.name);
+                                                    console.log('ShopID:', product.shopId);
+                                                    console.log('Target URL:', `/shop/${product.shopId}?table=${tableNumber}`);
+
+                                                    // Temporary alert for debugging
+                                                    if (!product.shopId) {
+                                                        e.preventDefault();
+                                                        alert('ERROR: This product has no shopId!');
+                                                        return;
+                                                    }
+                                                }}
                                             >
                                                 View Shop →
                                             </Link>
