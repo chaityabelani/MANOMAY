@@ -2,6 +2,7 @@ import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { getShopOrders } from '@/app/actions/order';
 import OrderList from './OrderList';
+import BackButton from '@/components/BackButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +18,9 @@ export default async function VendorOrdersPage() {
 
     return (
         <div className="p-6">
-            <div className="mb-6">
+            <BackButton href="/vendor/dashboard" label="Back to Dashboard" />
+
+            <div className="mb-6 mt-4">
                 <h1 className="text-3xl font-bold text-slate-900">Orders</h1>
                 <p className="text-slate-600">Manage incoming orders from customers</p>
             </div>

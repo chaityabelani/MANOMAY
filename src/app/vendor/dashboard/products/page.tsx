@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getVendorProducts } from '@/app/actions/product';
 import Link from 'next/link';
 import ProductList from './ProductList';
+import BackButton from '@/components/BackButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,7 @@ export default async function VendorProductsPage() {
     return (
         <div className="min-h-screen bg-slate-50 p-6">
             <div className="max-w-7xl mx-auto">
+                <BackButton href="/vendor/dashboard" label="Back to Dashboard" />
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
                     <div>

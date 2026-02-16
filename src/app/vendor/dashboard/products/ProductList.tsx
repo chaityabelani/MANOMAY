@@ -29,46 +29,61 @@ export default function ProductList({ products }: { products: Product[] }) {
             {products.map((product) => (
                 <div
                     key={product.id}
-                    className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-lg transition"
+                    className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-lg transition"
                 >
-                    <div className="flex justify-between items-start mb-3">
-                        <div>
-                            <h3 className="font-bold text-lg text-slate-900">
-                                {product.name}
-                            </h3>
-                            <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
-                                {product.category}
-                            </span>
+                    {/* Product Image */}
+                    {product.image ? (
+                        <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-full h-48 object-cover"
+                        />
+                    ) : (
+                        <div className="w-full h-48 bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center">
+                            <span className="text-6xl">🍽️</span>
                         </div>
-                        <span className="text-2xl">{product.isVeg ? '🟢' : '🔴'}</span>
-                    </div>
+                    )}
 
-                    <p className="text-sm text-slate-600 mb-3 line-clamp-2">
-                        {product.description}
-                    </p>
+                    <div className="p-5">
+                        <div className="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 className="font-bold text-lg text-slate-900">
+                                    {product.name}
+                                </h3>
+                                <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
+                                    {product.category}
+                                </span>
+                            </div>
+                            <span className="text-2xl">{product.isVeg ? '🟢' : '🔴'}</span>
+                        </div>
 
-                    <div className="flex justify-between items-center mb-4">
-                        <span className="text-2xl font-bold text-orange-600">
-                            ₹{product.price}
-                        </span>
-                        <button
-                            onClick={() => handleToggle(product.id)}
-                            className={`px-3 py-1 rounded-full text-sm font-bold transition ${product.isAvailable
+                        <p className="text-sm text-slate-600 mb-3 line-clamp-2">
+                            {product.description}
+                        </p>
+
+                        <div className="flex justify-between items-center mb-4">
+                            <span className="text-2xl font-bold text-orange-600">
+                                ₹{product.price}
+                            </span>
+                            <button
+                                onClick={() => handleToggle(product.id)}
+                                className={`px-3 py-1 rounded-full text-sm font-bold transition ${product.isAvailable
                                     ? 'bg-green-100 text-green-700'
                                     : 'bg-red-100 text-red-700'
-                                }`}
-                        >
-                            {product.isAvailable ? '✅ Available' : '❌ Unavailable'}
-                        </button>
-                    </div>
+                                    }`}
+                            >
+                                {product.isAvailable ? '✅ Available' : '❌ Unavailable'}
+                            </button>
+                        </div>
 
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => handleDelete(product.id, product.name)}
-                            className="flex-1 px-4 py-2 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition text-sm"
-                        >
-                            🗑️ Delete
-                        </button>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => handleDelete(product.id, product.name)}
+                                className="flex-1 px-4 py-2 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition text-sm"
+                            >
+                                🗑️ Delete
+                            </button>
+                        </div>
                     </div>
                 </div>
             ))}
