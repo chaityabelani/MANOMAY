@@ -110,9 +110,9 @@ function MenuContent() {
                     <div className="flex justify-between items-center mb-3">
                         <div className="flex items-center gap-3">
                             <Link
-                                href="/"
+                                href="/customer/dashboard"
                                 className="p-2 hover:bg-slate-100 rounded-lg transition flex items-center gap-1 text-slate-600 hover:text-slate-900"
-                                aria-label="Go to home"
+                                aria-label="Go to dashboard"
                             >
                                 <ArrowLeft className="w-5 h-5" />
                                 <span className="text-sm font-medium">Home</span>
