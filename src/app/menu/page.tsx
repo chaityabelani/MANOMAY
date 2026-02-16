@@ -5,7 +5,7 @@ import { searchProducts, getCategories } from '@/app/actions/search';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Search, Filter, X, ArrowLeft } from 'lucide-react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import TableNumberInput from '@/components/TableNumberInput';
 import { useCartStore } from '@/store/useCartStore';
 
@@ -23,7 +23,6 @@ type Product = {
 
 function MenuContent() {
     const searchParams = useSearchParams();
-    const router = useRouter();
     const tableNumber = searchParams.get('table') || '1';
 
     const [products, setProducts] = useState<Product[]>([]);
@@ -110,14 +109,14 @@ function MenuContent() {
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex justify-between items-center mb-3">
                         <div className="flex items-center gap-3">
-                            <button
-                                onClick={() => router.back()}
+                            <Link
+                                href="/"
                                 className="p-2 hover:bg-slate-100 rounded-lg transition flex items-center gap-1 text-slate-600 hover:text-slate-900"
-                                aria-label="Go back"
+                                aria-label="Go to home"
                             >
                                 <ArrowLeft className="w-5 h-5" />
-                                <span className="text-sm font-medium">Back</span>
-                            </button>
+                                <span className="text-sm font-medium">Home</span>
+                            </Link>
                             <div className="border-l border-slate-300 h-6"></div>
                             <div>
                                 <h1 className="text-2xl font-bold text-slate-900">Manomay Food Court</h1>

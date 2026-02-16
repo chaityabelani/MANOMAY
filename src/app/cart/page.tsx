@@ -3,10 +3,8 @@
 import { useCartStore } from '@/store/useCartStore';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 
 export default function CartPage() {
-    const router = useRouter();
     const { items, updateQuantity, removeFromCart, getTotalPrice, getItemsByShop, clearCart } = useCartStore();
 
     const itemsByShop = getItemsByShop();
@@ -37,12 +35,12 @@ export default function CartPage() {
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
                         <h1 className="text-2xl font-bold text-slate-900">Your Cart</h1>
-                        <button
-                            onClick={() => router.back()}
+                        <Link
+                            href="/menu"
                             className="text-slate-600 hover:text-slate-900 font-medium"
                         >
                             ← Continue Shopping
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </header>
