@@ -281,14 +281,26 @@ function MenuContent() {
                                                     console.log('🔍 DEBUG: View Shop clicked');
                                                     console.log('Product:', product.name);
                                                     console.log('ShopID:', product.shopId);
+                                                    console.log('ShopName:', product.shopName);
                                                     console.log('Target URL:', `/shop/${product.shopId}?table=${tableNumber}`);
+                                                    console.log('Full Product Object:', product);
 
-                                                    // Temporary alert for debugging
+                                                    // Validation
                                                     if (!product.shopId) {
                                                         e.preventDefault();
                                                         alert('ERROR: This product has no shopId!');
+                                                        console.error('❌ Product missing shopId:', product);
                                                         return;
                                                     }
+
+                                                    if (product.shopId.length < 10) {
+                                                        e.preventDefault();
+                                                        alert(`WARNING: Invalid shopId format: ${product.shopId}`);
+                                                        console.error('❌ Invalid shopId format:', product.shopId);
+                                                        return;
+                                                    }
+
+                                                    console.log('✅ shopId validation passed, navigating...');
                                                 }}
                                             >
                                                 View Shop →
