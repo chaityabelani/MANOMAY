@@ -90,7 +90,7 @@ export async function searchProducts(query: string = '', filters: SearchFilters 
             })
             .map(p => {
                 const shop = shopMap.get(p.shopId?.toString() || '');
-                return {
+                const productData = {
                     id: p._id.toString(),
                     name: p.name || 'Unnamed Product',
                     description: p.description || '',
@@ -101,6 +101,11 @@ export async function searchProducts(query: string = '', filters: SearchFilters 
                     shopId: p.shopId?.toString() || '',
                     shopName: shop?.name || 'Unknown Shop',
                 };
+
+                // SERVER LOG: Track shopId for debugging
+                console.log('📦 Product:', productData.name, '| ShopID:', productData.shopId || 'MISSING!');
+
+                return productData;
             });
 
         return {
