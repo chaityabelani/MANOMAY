@@ -13,10 +13,10 @@ const genAI = new GoogleGenerativeAI(API_KEY);
  * Using stable v1 model
  */
 export function getGeminiModel() {
-  // Using stable model name without -latest suffix
-  // This works with v1beta API
+  // Using gemini-pro-vision for v1beta API compatibility
+  // This model works with API keys from Google AI Studio
   return genAI.getGenerativeModel({
-    model: "gemini-1.5-flash", // Stable model name for v1beta API
+    model: "gemini-pro-vision", // Compatible with v1beta API
     generationConfig: {
       temperature: 0.2, // Lower = better structured JSON
       topP: 1,
