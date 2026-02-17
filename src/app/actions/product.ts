@@ -78,31 +78,43 @@ export async function getVendorStats() {
         // Import Order model
         const Order = (await import('@/models/Order')).default;
 
-        // Get today's orders for this shop
-        const todaysOrders = await Order.find({
-            'items.shopId': shop._id,
-            createdAt: { $gte: today, $lt: tomorrow }
-        });
-
-        const ordersToday = todaysOrders.length;
-
-        // Calculate today's revenue
-        let revenueToday = 0;
-        todaysOrders.forEach(order => {
-            order.items.forEach((item: any) => {
-                if (item.shopId?.toString() === shop._id.toString()) {
-                    revenueToday += item.price * item.quantity;
+        // Use aggregation pipeline for better performance
+        const orderStats = await Order.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: today, $lt: tomorrow }
                 }
-            });
-        });
+            },
+            {
+                $unwind: '$items'
+            },
+            {
+                $match: {
+                    'items.shopId': shop._id
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    ordersToday: { $sum: 1 },
+                    revenueToday: {
+                        $sum: {
+                            $multiply: ['$items.price', '$items.quantity']
+                        }
+                    }
+                }
+            }
+        ]);
+
+        const stats = orderStats[0] || { ordersToday: 0, revenueToday: 0 };
 
         return {
             success: true,
             stats: {
                 totalProducts,
                 activeProducts,
-                ordersToday,
-                revenueToday
+                ordersToday: stats.ordersToday,
+                revenueToday: stats.revenueToday
             }
         };
     } catch (error: any) {

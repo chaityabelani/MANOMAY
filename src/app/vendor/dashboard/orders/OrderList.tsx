@@ -36,17 +36,18 @@ export default function OrderList({
 }) {
     const [filter, setFilter] = useState<string>('all');
 
-    // Auto-refresh every 10 seconds
-    const { data, mutate } = useSWR(
-        `/api/vendor/orders?vendorId=${vendorId}`,
+    // Auto-refresh every 60 seconds (reduced from 30s)
+    const { data: swrData, error, mutate } = useSWR(
+        `/api/vendor/orders?vendorId=${vendorId}`, // Keeping original URL structure, assuming vendorId is still used
         fetcher,
         {
-            fallbackData: { orders: initialOrders },
-            refreshInterval: 10000, // 10 seconds
+            fallbackData: { orders: initialOrders }, // Keeping fallbackData as it was in original
+            refreshInterval: 60000, // Auto-refresh every 60 seconds
+            revalidateOnFocus: true, // Added from instruction
         }
     );
 
-    const orders: Order[] = data?.orders || initialOrders;
+    const orders: Order[] = swrData?.orders || initialOrders;
 
     const filteredOrders = orders.filter((order) => {
         if (filter === 'all') return true;
@@ -87,8 +88,8 @@ export default function OrderList({
                         key={status}
                         onClick={() => setFilter(status)}
                         className={`px-4 py-2 rounded-xl font-medium capitalize whitespace-nowrap transition ${filter === status
-                                ? 'bg-orange-600 text-white'
-                                : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                            ? 'bg-orange-600 text-white'
+                            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
                             }`}
                     >
                         {status}

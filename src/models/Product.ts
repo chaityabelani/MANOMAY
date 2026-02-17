@@ -61,6 +61,11 @@ const ProductSchema: Schema<IProduct> = new Schema(
     }
 );
 
+// Add indexes for better query performance
+ProductSchema.index({ shopId: 1, isAvailable: 1 });
+ProductSchema.index({ shopId: 1, createdAt: -1 });
+ProductSchema.index({ category: 1, isAvailable: 1 });
+
 const Product: Model<IProduct> =
     mongoose.models.Product || mongoose.model<IProduct>('Product', ProductSchema);
 

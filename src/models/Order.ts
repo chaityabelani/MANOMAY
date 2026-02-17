@@ -92,6 +92,12 @@ const OrderSchema: Schema<IOrder> = new Schema(
     }
 );
 
+// Add indexes for better query performance
+OrderSchema.index({ userId: 1, createdAt: -1 });
+OrderSchema.index({ 'items.shopId': 1, createdAt: -1 });
+OrderSchema.index({ status: 1, createdAt: -1 });
+OrderSchema.index({ createdAt: -1 });
+
 const Order: Model<IOrder> =
     mongoose.models.Order || mongoose.model<IOrder>('Order', OrderSchema);
 
