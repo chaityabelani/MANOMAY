@@ -13,12 +13,10 @@ const genAI = new GoogleGenerativeAI(API_KEY);
  * Using stable v1 model
  */
 export function getGeminiModel() {
-  // Try different model names based on API availability
-  // Option 1: gemini-1.5-flash (fastest)
-  // Option 2: gemini-pro-vision (stable, older)
-  // Option 3: gemini-1.5-pro (most accurate)
+  // Using stable model name without -latest suffix
+  // This works with v1beta API
   return genAI.getGenerativeModel({
-    model: "gemini-1.5-flash-latest", // Using -latest suffix for newer API
+    model: "gemini-1.5-flash", // Stable model name for v1beta API
     generationConfig: {
       temperature: 0.2, // Lower = better structured JSON
       topP: 1,
