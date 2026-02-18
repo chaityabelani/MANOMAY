@@ -10,18 +10,18 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 
 /**
  * Get Gemini model for menu scanning
- * Using stable v1 model
+ * Using gemini-1.5-flash (multimodal, fast, free-tier eligible)
  */
 export function getGeminiModel() {
-  // Using gemini-pro-vision for v1beta API compatibility
-  // This model works with API keys from Google AI Studio
+  // gemini-pro-vision was retired — replaced by gemini-1.5-flash
+  // which handles text + images natively on the stable v1 API
   return genAI.getGenerativeModel({
-    model: "gemini-pro-vision", // Compatible with v1beta API
+    model: "gemini-1.5-flash",
     generationConfig: {
       temperature: 0.2, // Lower = better structured JSON
       topP: 1,
       topK: 1,
-      maxOutputTokens: 2048,
+      maxOutputTokens: 4096,
     },
   });
 }
