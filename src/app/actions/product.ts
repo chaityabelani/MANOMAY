@@ -130,7 +130,7 @@ export async function getVendorStats() {
 /**
  * Save scanned products (bulk)
  */
-export async function saveBulkProducts(products: { name: string; price: number; description: string }[]) {
+export async function saveBulkProducts(products: { name: string; price: number; description?: string }[]) {
     try {
         const session = await getSession();
         if (!session || session.user.role !== 'vendor') {
@@ -150,7 +150,7 @@ export async function saveBulkProducts(products: { name: string; price: number; 
         const productDocs = products.map(p => ({
             shopId: shopId,
             name: p.name,
-            description: p.description,
+            description: p.description || '',
             price: p.price,
             category: 'General', // Default category
             isVeg: false, // Default
@@ -185,14 +185,14 @@ export async function createProduct(formData: FormData) {
 
         // Extract and validate form data
         const name = formData.get('name') as string;
-        const description = formData.get('description') as string;
+        const description = (formData.get('description') as string) || '';
         const priceStr = formData.get('price') as string;
         const category = (formData.get('category') as string) || 'General';
         const image = (formData.get('image') as string) || '';
         const isVeg = formData.get('isVeg') === 'true';
 
         // Validation
-        if (!name || !description || !priceStr) {
+        if (!name || !priceStr) {
             return { success: false, error: 'Missing required fields' };
         }
 
@@ -335,14 +335,14 @@ export async function updateProduct(productId: string, formData: FormData) {
 
         // Extract form data
         const name = formData.get('name') as string;
-        const description = formData.get('description') as string;
+        const description = (formData.get('description') as string) || '';
         const priceStr = formData.get('price') as string;
         const category = (formData.get('category') as string) || 'General';
         const image = (formData.get('image') as string) || '';
         const isVeg = formData.get('isVeg') === 'true';
 
         // Validation
-        if (!name || !description || !priceStr) {
+        if (!name || !priceStr) {
             return { success: false, error: 'Missing required fields' };
         }
 

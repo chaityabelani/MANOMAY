@@ -3,7 +3,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export interface IProduct extends Document {
     shopId: mongoose.Types.ObjectId;
     name: string;
-    description: string;
+    description?: string;
     price: number;
     category: string;
     image?: string;
@@ -29,7 +29,7 @@ const ProductSchema: Schema<IProduct> = new Schema(
         },
         description: {
             type: String,
-            required: [true, 'Description is required'],
+            default: '',
         },
         price: {
             type: Number,
