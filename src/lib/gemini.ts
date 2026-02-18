@@ -41,15 +41,13 @@ Return ONLY a valid JSON array with this exact structure:
 [
   {
     "name": "dish name",
-    "price": number,
-    "description": "brief description"
+    "price": number
   }
 ]
 
 Rules:
 - Extract ALL visible menu items
 - Price must be number only (no ₹ $ etc)
-- If no description visible, use empty string
 - Do NOT return markdown
 - Do NOT return explanations
 `;
