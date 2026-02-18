@@ -10,13 +10,12 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 
 /**
  * Get Gemini model for menu scanning
- * Using gemini-1.5-flash (multimodal, fast, free-tier eligible)
+ * Using gemini-2.5-flash (current default in AI Studio, Feb 2026)
  */
 export function getGeminiModel() {
-  // gemini-pro-vision was retired — replaced by gemini-1.5-flash
-  // which handles text + images natively on the stable v1 API
+  // gemini-2.5-flash — current stable model with strong vision capabilities
   return genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
+    model: "gemini-2.5-flash",
     generationConfig: {
       temperature: 0.2, // Lower = better structured JSON
       topP: 1,
