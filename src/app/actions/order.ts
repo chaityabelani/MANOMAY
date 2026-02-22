@@ -140,13 +140,27 @@ export async function updateOrderStatus(orderId: string, status: string) {
     try {
         await connectDB();
 
-        await Order.findByIdAndUpdate(orderId, { status });
+        // FIX: Use { new: true } to get the updated doc back and verify the write
+        const updated = await Order.findByIdAndUpdate(
+            orderId,
+            { status },
+            { new: true }
+        );
+
+        if (!updated) {
+            return { success: false, error: 'Order not found' };
+        }
+
+        // Verify the write actually persisted
+        if (updated.status !== status) {
+            return { success: false, error: 'Status update failed to persist' };
+        }
 
         revalidatePath('/vendor/dashboard/orders');
 
-        return { success: true };
+        return { success: true, newStatus: updated.status };
     } catch (error: any) {
-        console.error('Update order status error:', error);
+        console.error('[updateOrderStatus] error:', error);
         return { success: false, error: error.message };
     }
 }

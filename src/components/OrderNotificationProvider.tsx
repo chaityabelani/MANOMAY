@@ -23,6 +23,9 @@ const NotificationContext = createContext<NotificationContextType>({
     onOrderReady: () => { },
 });
 
+// sessionStorage key — survives component remounts but resets on new browser session
+const SEED_KEY = 'manomay_notif_seeded';
+
 export function useOrderNotification() {
     return useContext(NotificationContext);
 }
@@ -31,22 +34,27 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function OrderNotificationProvider({ children }: { children: React.ReactNode }) {
     const [toast, setToast] = useState<ToastData | null>(null);
-    // Phone is stored in localStorage at checkout — works for guests AND logged-in users
     const [customerPhone, setCustomerPhone] = useState<string | null>(null);
-    const prevStatuses = useRef<Record<string, string>>({});
-    const seeded = useRef(false);
 
-    // Read phone from localStorage on mount (client-side only)
+    // prevStatuses persists in ref — survives re-renders but NOT remounts
+    // Combined with sessionStorage seed flag this prevents duplicate toasts
+    const prevStatuses = useRef<Record<string, string>>({});
+
     useEffect(() => {
+        // Read phone from localStorage (set at checkout for both guest + logged-in)
         const phone = localStorage.getItem('manomay_customer_phone');
         if (phone) setCustomerPhone(phone);
+
+        // Clear seed flag when tab closes so next session starts fresh
+        const clearSeed = () => sessionStorage.removeItem(SEED_KEY);
+        window.addEventListener('beforeunload', clearSeed);
+        return () => window.removeEventListener('beforeunload', clearSeed);
     }, []);
 
     const onOrderReady = useCallback((orderId: string, shopName = 'your shop') => {
         setToast({ orderId, shopName });
     }, []);
 
-    // Poll every 10 seconds when we have a phone number
     useSWR<{ orders: OrderStatus[] }>(
         customerPhone
             ? `/api/customer/order-status?phone=${encodeURIComponent(customerPhone)}`
@@ -55,19 +63,28 @@ export default function OrderNotificationProvider({ children }: { children: Reac
         {
             refreshInterval: 10000,
             revalidateOnFocus: true,
+            // Retry up to 3 times on network error, with 5s backoff
+            errorRetryCount: 3,
+            errorRetryInterval: 5000,
+            onError(err) {
+                console.error('[OrderNotification] polling error:', err);
+            },
             onSuccess(data) {
                 if (!data?.orders) return;
 
-                // First load: seed statuses silently (don't fire for already-ready orders)
-                if (!seeded.current) {
+                const alreadySeeded = sessionStorage.getItem(SEED_KEY);
+
+                if (!alreadySeeded) {
+                    // FIX: Use sessionStorage for seed flag so it survives page
+                    // navigation (component remounts) without re-firing old toasts
                     data.orders.forEach(({ id, status }) => {
                         prevStatuses.current[id] = status;
                     });
-                    seeded.current = true;
+                    sessionStorage.setItem(SEED_KEY, '1');
                     return;
                 }
 
-                // Subsequent polls: fire Toast only on → ready transitions
+                // Detect transitions → ready only
                 data.orders.forEach(({ id, status, shopName }) => {
                     const prev = prevStatuses.current[id];
                     if (status === 'ready' && prev !== undefined && prev !== 'ready') {

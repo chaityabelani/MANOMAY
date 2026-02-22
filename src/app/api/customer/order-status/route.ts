@@ -10,10 +10,17 @@ import Order from '@/models/Order';
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
-        const phone = searchParams.get('phone');
+        let phone = searchParams.get('phone') ?? '';
 
-        if (!phone) {
-            return NextResponse.json({ error: 'phone is required' }, { status: 400 });
+        // FIX: Normalize phone — strip all non-digits, remove country code prefix,
+        // take last 10 digits. Prevents mismatch if customer typed +91XXXXXXXXXX
+        phone = phone.replace(/\D/g, '').replace(/^91/, '').slice(-10);
+
+        if (phone.length !== 10) {
+            return NextResponse.json(
+                { error: 'Invalid phone number format' },
+                { status: 400 }
+            );
         }
 
         await connectDB();
