@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import OrderNotificationProvider from '@/components/OrderNotificationProvider';
 
 export const metadata: Metadata = {
     title: 'MANOMAY - Digital Food Court',
@@ -13,7 +14,11 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body className="antialiased">{children}</body>
+            <body className="antialiased">
+                <OrderNotificationProvider>
+                    {children}
+                </OrderNotificationProvider>
+            </body>
         </html>
     );
 }

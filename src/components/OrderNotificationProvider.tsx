@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useCallback, useContext, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 import OrderToast from './OrderToast';
 
@@ -16,7 +16,6 @@ interface ToastData {
 }
 
 interface NotificationContextType {
-    /** Call this to manually fire the "order ready" toast */
     onOrderReady: (orderId: string, shopName?: string) => void;
 }
 
@@ -30,31 +29,28 @@ export function useOrderNotification() {
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
-interface Props {
-    children: React.ReactNode;
-    /** Customer's userId from JWT session — used to query their orders */
-    userId?: string;
-}
-
-/**
- * Wraps customer pages. Polls /api/customer/order-status every 10s.
- * When any order transitions to "ready", fires the OrderToast.
- * Exposes onOrderReady(orderId) for manual triggering.
- */
-export default function OrderNotificationProvider({ children, userId }: Props) {
+export default function OrderNotificationProvider({ children }: { children: React.ReactNode }) {
     const [toast, setToast] = useState<ToastData | null>(null);
-    // Track previously-seen statuses so we only fire on *transitions* → ready
+    // Phone is stored in localStorage at checkout — works for guests AND logged-in users
+    const [customerPhone, setCustomerPhone] = useState<string | null>(null);
     const prevStatuses = useRef<Record<string, string>>({});
     const seeded = useRef(false);
 
-    /** Programmatic trigger — satisfies the `onOrderReady(orderId)` requirement */
+    // Read phone from localStorage on mount (client-side only)
+    useEffect(() => {
+        const phone = localStorage.getItem('manomay_customer_phone');
+        if (phone) setCustomerPhone(phone);
+    }, []);
+
     const onOrderReady = useCallback((orderId: string, shopName = 'your shop') => {
         setToast({ orderId, shopName });
     }, []);
 
-    // Poll every 10 seconds when a userId is available
+    // Poll every 10 seconds when we have a phone number
     useSWR<{ orders: OrderStatus[] }>(
-        userId ? `/api/customer/order-status?userId=${encodeURIComponent(userId)}` : null,
+        customerPhone
+            ? `/api/customer/order-status?phone=${encodeURIComponent(customerPhone)}`
+            : null,
         fetcher,
         {
             refreshInterval: 10000,
@@ -62,7 +58,7 @@ export default function OrderNotificationProvider({ children, userId }: Props) {
             onSuccess(data) {
                 if (!data?.orders) return;
 
-                // On first load, seed statuses without firing toasts
+                // First load: seed statuses silently (don't fire for already-ready orders)
                 if (!seeded.current) {
                     data.orders.forEach(({ id, status }) => {
                         prevStatuses.current[id] = status;
@@ -71,7 +67,7 @@ export default function OrderNotificationProvider({ children, userId }: Props) {
                     return;
                 }
 
-                // On subsequent polls, detect ready transitions
+                // Subsequent polls: fire Toast only on → ready transitions
                 data.orders.forEach(({ id, status, shopName }) => {
                     const prev = prevStatuses.current[id];
                     if (status === 'ready' && prev !== undefined && prev !== 'ready') {
@@ -86,8 +82,6 @@ export default function OrderNotificationProvider({ children, userId }: Props) {
     return (
         <NotificationContext.Provider value={{ onOrderReady }}>
             {children}
-
-            {/* Toast overlay — fixed position, outside all scroll containers */}
             {toast && (
                 <OrderToast
                     orderId={toast.orderId}

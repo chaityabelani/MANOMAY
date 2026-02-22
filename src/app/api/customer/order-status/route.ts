@@ -3,17 +3,17 @@ import connectDB from '@/lib/db';
 import Order from '@/models/Order';
 
 /**
- * GET /api/customer/order-status?userId=<userId>
- * Returns current statuses for all orders in the last 24h for this user.
- * Used by OrderNotificationProvider to detect `→ ready` transitions.
+ * GET /api/customer/order-status?phone=<customerPhone>
+ * Returns statuses for all orders in the last 24h for this phone number.
+ * Phone is used because ALL orders (guest + logged-in) always have customerPhone.
  */
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
-        const userId = searchParams.get('userId');
+        const phone = searchParams.get('phone');
 
-        if (!userId) {
-            return NextResponse.json({ error: 'userId required' }, { status: 400 });
+        if (!phone) {
+            return NextResponse.json({ error: 'phone is required' }, { status: 400 });
         }
 
         await connectDB();
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
         const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
         const orders = await Order.find({
-            userId,
+            customerPhone: phone,
             createdAt: { $gte: since },
         })
             .select('_id status shopId')
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({ orders: result });
     } catch (error: any) {
-        console.error('order-status API error:', error);
+        console.error('[order-status] error:', error);
         return NextResponse.json(
             { error: error.message || 'Failed to fetch order status' },
             { status: 500 }

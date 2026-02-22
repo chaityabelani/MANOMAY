@@ -37,6 +37,8 @@ export default function CheckoutPage() {
         });
 
         if (result.success) {
+            // 🔔 Save phone so OrderNotificationProvider can poll for "ready" status
+            localStorage.setItem('manomay_customer_phone', customerPhone);
             clearCart();
             router.push(`/confirmation?orders=${result.orderIds?.join(',')}`);
         } else {
