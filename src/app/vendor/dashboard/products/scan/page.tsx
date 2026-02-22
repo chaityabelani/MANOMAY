@@ -8,7 +8,7 @@ import BackButton from '@/components/BackButton';
 interface ScannedProduct {
     name: string;
     price: number;
-    description: string;
+    description?: string;
 }
 
 export default function AIMenuScanner() {

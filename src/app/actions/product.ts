@@ -243,7 +243,7 @@ export async function getVendorProducts() {
             products: products.map(p => ({
                 id: p._id.toString(),
                 name: p.name,
-                description: p.description,
+                description: p.description || '',
                 price: p.price,
                 category: p.category,
                 image: p.image || '',
@@ -307,7 +307,7 @@ export async function getProductById(productId: string) {
             product: {
                 id: product._id.toString(),
                 name: product.name,
-                description: product.description,
+                description: product.description || '',
                 price: product.price,
                 category: product.category,
                 image: product.image || '',

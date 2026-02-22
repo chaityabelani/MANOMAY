@@ -9,7 +9,7 @@ interface Product {
     shopId: string;
     shopName: string;
     name: string;
-    description: string;
+    description?: string;
     price: number;
     image: string;
     isVeg: boolean;
@@ -80,8 +80,8 @@ export default function ProductGrid({ products }: { products: Product[] }) {
                             <button
                                 onClick={() => handleAddToCart(product)}
                                 className={`px-5 py-2 rounded-xl font-bold transition ${addedProduct === product.id
-                                        ? 'bg-green-600 text-white'
-                                        : 'bg-orange-600 text-white hover:bg-orange-700'
+                                    ? 'bg-green-600 text-white'
+                                    : 'bg-orange-600 text-white hover:bg-orange-700'
                                     }`}
                             >
                                 {addedProduct === product.id ? '✓ Added!' : '+ Add'}

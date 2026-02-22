@@ -12,7 +12,7 @@ import { useCartStore } from '@/store/useCartStore';
 type Product = {
     id: string;
     name: string;
-    description: string;
+    description?: string;
     price: number;
     category: string;
     image: string;

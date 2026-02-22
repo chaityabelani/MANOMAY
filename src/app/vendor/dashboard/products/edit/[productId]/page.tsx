@@ -35,7 +35,7 @@ export default function EditProductPage() {
             if (result.success && result.product) {
                 setFormData({
                     name: result.product.name,
-                    description: result.product.description,
+                    description: result.product.description || '',
                     price: result.product.price.toString(),
                     category: result.product.category,
                     isVeg: result.product.isVeg,
