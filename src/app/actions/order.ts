@@ -3,6 +3,7 @@
 import connectDB from '@/lib/db';
 import Order from '@/models/Order';
 import Shop from '@/models/Shop';
+import { getSession } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 
 interface OrderItem {
@@ -42,6 +43,10 @@ export async function createOrder(data: CreateOrderData) {
         // Create separate order for each shop
         const orderIds: string[] = [];
 
+        // Attach userId if customer is logged in
+        const session = await getSession();
+        const userId = session?.user?.role === 'customer' ? session.user.userId : undefined;
+
         for (const [shopId, shopItems] of Object.entries(itemsByShop) as [string, OrderItem[]][]) {
             const totalAmount = shopItems.reduce(
                 (sum, item) => sum + item.price * item.quantity,
@@ -54,6 +59,7 @@ export async function createOrder(data: CreateOrderData) {
                 tableNumber,
                 customerName,
                 customerPhone,
+                userId,
                 items: shopItems.map(item => ({
                     productId: item.productId,
                     shopId: item.shopId,  // ← FIXED: Include shopId for each item
