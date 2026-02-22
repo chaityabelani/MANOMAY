@@ -55,10 +55,10 @@ export default function ConfirmationPage({
                         Order More
                     </Link>
                     <Link
-                        href="/"
+                        href="/menu"
                         className="block w-full bg-slate-100 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-200 transition"
                     >
-                        Back to Home
+                        Back to Menu
                     </Link>
                 </div>
 

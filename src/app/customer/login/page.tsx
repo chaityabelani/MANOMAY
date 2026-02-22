@@ -89,8 +89,8 @@ export default function CustomerLoginPage() {
                     </div>
 
                     <div className="mt-4 text-center">
-                        <Link href="/" className="text-slate-500 hover:text-brand-600 text-sm transition">
-                            ← Back to Home
+                        <Link href="/menu" className="text-slate-500 hover:text-brand-600 text-sm transition">
+                            ← Back to Menu
                         </Link>
                     </div>
                 </div>

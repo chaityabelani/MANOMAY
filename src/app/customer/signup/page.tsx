@@ -126,8 +126,8 @@ export default function CustomerSignupPage() {
                             Already have an account? Sign in
                         </Link>
                         <br />
-                        <Link href="/" className="text-white/60 hover:text-white text-sm">
-                            ← Back to Home
+                        <Link href="/menu" className="text-white/60 hover:text-white text-sm">
+                            ← Back to Menu
                         </Link>
                     </div>
                 </div>
