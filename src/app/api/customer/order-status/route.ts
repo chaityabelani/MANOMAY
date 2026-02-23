@@ -3,22 +3,28 @@ import connectDB from '@/lib/db';
 import Order from '@/models/Order';
 
 /**
- * GET /api/customer/order-status?phone=<customerPhone>
- * Returns statuses for all orders in the last 24h for this phone number.
- * Phone is used because ALL orders (guest + logged-in) always have customerPhone.
+ * GET /api/customer/order-status
+ * Accepts either:
+ *   - ?phone=<customerPhone>  (guest + logged-in customers who checked out)
+ *   - ?userId=<userId>        (logged-in customers who skipped checkout this session)
+ * Returns statuses for all orders in the last 24h matching the identifier.
  */
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
+        const userId = searchParams.get('userId') ?? '';
         let phone = searchParams.get('phone') ?? '';
 
-        // FIX: Normalize phone — strip all non-digits, remove country code prefix,
-        // take last 10 digits. Prevents mismatch if customer typed +91XXXXXXXXXX
+        // Normalize phone — strip non-digits, remove country code, take last 10 digits
         phone = phone.replace(/\D/g, '').replace(/^91/, '').slice(-10);
 
-        if (phone.length !== 10) {
+        // Require at least one valid identifier
+        const hasPhone = phone.length === 10;
+        const hasUserId = userId.length > 0;
+
+        if (!hasPhone && !hasUserId) {
             return NextResponse.json(
-                { error: 'Invalid phone number format' },
+                { error: 'Provide a valid phone number or userId' },
                 { status: 400 }
             );
         }
@@ -27,10 +33,15 @@ export async function GET(request: NextRequest) {
 
         const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-        const orders = await Order.find({
-            customerPhone: phone,
-            createdAt: { $gte: since },
-        })
+        // Build query — prefer phone when available, fall back to userId
+        const query: Record<string, unknown> = { createdAt: { $gte: since } };
+        if (hasPhone) {
+            query.customerPhone = phone;
+        } else {
+            query.userId = userId;
+        }
+
+        const orders = await Order.find(query)
             .select('_id status shopId')
             .populate('shopId', 'name')
             .sort({ createdAt: -1 })

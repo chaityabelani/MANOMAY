@@ -34,16 +34,31 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function OrderNotificationProvider({ children }: { children: React.ReactNode }) {
     const [toast, setToast] = useState<ToastData | null>(null);
-    const [customerPhone, setCustomerPhone] = useState<string | null>(null);
+    const [pollKey, setPollKey] = useState<string | null>(null);
 
     // prevStatuses persists in ref — survives re-renders but NOT remounts
     // Combined with sessionStorage seed flag this prevents duplicate toasts
     const prevStatuses = useRef<Record<string, string>>({});
 
     useEffect(() => {
-        // Read phone from localStorage (set at checkout for both guest + logged-in)
+        // 1. Try phone from localStorage (set at checkout for guest + logged-in)
         const phone = localStorage.getItem('manomay_customer_phone');
-        if (phone) setCustomerPhone(phone);
+        if (phone) {
+            setPollKey(`/api/customer/order-status?phone=${encodeURIComponent(phone)}`);
+            return;
+        }
+
+        // 2. No phone → try authenticated session (logged-in customer, no recent checkout)
+        fetch('/api/auth/me')
+            .then((r) => r.json())
+            .then((data) => {
+                if (data?.userId) {
+                    setPollKey(`/api/customer/order-status?userId=${encodeURIComponent(data.userId)}`);
+                }
+            })
+            .catch(() => {
+                // Silently fail — user just won't get notifications if unauthenticated
+            });
 
         // Clear seed flag when tab closes so next session starts fresh
         const clearSeed = () => sessionStorage.removeItem(SEED_KEY);
@@ -56,9 +71,7 @@ export default function OrderNotificationProvider({ children }: { children: Reac
     }, []);
 
     useSWR<{ orders: OrderStatus[] }>(
-        customerPhone
-            ? `/api/customer/order-status?phone=${encodeURIComponent(customerPhone)}`
-            : null,
+        pollKey,
         fetcher,
         {
             refreshInterval: 10000,
@@ -75,8 +88,7 @@ export default function OrderNotificationProvider({ children }: { children: Reac
                 const alreadySeeded = sessionStorage.getItem(SEED_KEY);
 
                 if (!alreadySeeded) {
-                    // FIX: Use sessionStorage for seed flag so it survives page
-                    // navigation (component remounts) without re-firing old toasts
+                    // Seed initial statuses so we only fire toasts for NEW transitions
                     data.orders.forEach(({ id, status }) => {
                         prevStatuses.current[id] = status;
                     });
