@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ShoppingBag, Clock } from 'lucide-react';
 import UserNotification from '@/components/UserNotification';
+import RecentOrders from '@/components/RecentOrders';
 
 export const dynamic = 'force-dynamic';
 
@@ -80,19 +81,16 @@ export default async function CustomerDashboard() {
                     </Link>
                 </div>
 
-                {/* Recent Activity */}
+                {/* Recent Activity — live polling every 8s */}
                 <div className="bg-white rounded-2xl p-6 border border-slate-200">
-                    <h3 className="font-bold text-lg mb-4">Recent Activity</h3>
-                    <div className="text-center py-8">
-                        <div className="text-6xl mb-4">📋</div>
-                        <p className="text-slate-600">No recent orders</p>
-                        <Link
-                            href="/menu"
-                            className="inline-block mt-4 px-6 py-2 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition"
-                        >
-                            Start Ordering
-                        </Link>
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-bold text-lg">Recent Activity</h3>
+                        <span className="flex items-center gap-1.5 text-xs text-green-600 font-medium">
+                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                            Live
+                        </span>
                     </div>
+                    <RecentOrders />
                 </div>
             </div>
         </div>

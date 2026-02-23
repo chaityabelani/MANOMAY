@@ -112,7 +112,7 @@ export async function getCustomerOrders() {
 
         await connectDB();
 
-        const orders = await Order.find({ customerPhone: session.user.email }) // Using email as identifier for now
+        const orders = await Order.find({ userId: session.user.userId })
             .sort({ createdAt: -1 })
             .limit(50)
             .lean();

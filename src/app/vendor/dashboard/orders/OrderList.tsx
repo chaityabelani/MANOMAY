@@ -36,14 +36,15 @@ export default function OrderList({
 }) {
     const [filter, setFilter] = useState<string>('all');
 
-    // Auto-refresh every 60 seconds (reduced from 30s)
+    // Auto-refresh every 8 seconds for near real-time order visibility
     const { data: swrData, error, mutate } = useSWR(
-        `/api/vendor/orders?vendorId=${vendorId}`, // Keeping original URL structure, assuming vendorId is still used
+        `/api/vendor/orders?vendorId=${vendorId}`,
         fetcher,
         {
-            fallbackData: { orders: initialOrders }, // Keeping fallbackData as it was in original
-            refreshInterval: 60000, // Auto-refresh every 60 seconds
-            revalidateOnFocus: true, // Added from instruction
+            fallbackData: { orders: initialOrders },
+            refreshInterval: 8000,
+            revalidateOnFocus: true,
+            revalidateOnReconnect: true,
         }
     );
 
