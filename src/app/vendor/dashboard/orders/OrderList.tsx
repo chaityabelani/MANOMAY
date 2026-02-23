@@ -1,8 +1,9 @@
 'use client';
 
 import useSWR from 'swr';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { updateOrderStatus } from '@/app/actions/order';
+import * as XLSX from 'xlsx';
 
 interface OrderItem {
     productId: string;
@@ -34,10 +35,13 @@ export default function OrderList({
     initialOrders: Order[];
     vendorId: string;
 }) {
-    const [filter, setFilter] = useState<string>('all');
+    const [statusFilter, setStatusFilter] = useState<string>('all');
+    const [dateFrom, setDateFrom] = useState<string>('');
+    const [dateTo, setDateTo] = useState<string>('');
+    const [exporting, setExporting] = useState(false);
 
     // Auto-refresh every 8 seconds for near real-time order visibility
-    const { data: swrData, error, mutate } = useSWR(
+    const { data: swrData, mutate } = useSWR(
         `/api/vendor/orders?vendorId=${vendorId}`,
         fetcher,
         {
@@ -50,17 +54,89 @@ export default function OrderList({
 
     const orders: Order[] = swrData?.orders || initialOrders;
 
-    const filteredOrders = orders.filter((order) => {
-        if (filter === 'all') return true;
-        return order.status === filter;
-    });
+    // Apply status + date range filters
+    const filteredOrders = useMemo(() => {
+        return orders.filter((order) => {
+            if (statusFilter !== 'all' && order.status !== statusFilter) return false;
+            if (dateFrom && new Date(order.createdAt) < new Date(dateFrom)) return false;
+            if (dateTo) {
+                const endOfDay = new Date(dateTo);
+                endOfDay.setHours(23, 59, 59, 999);
+                if (new Date(order.createdAt) > endOfDay) return false;
+            }
+            return true;
+        });
+    }, [orders, statusFilter, dateFrom, dateTo]);
 
     async function handleStatusChange(orderId: string, newStatus: string) {
         const result = await updateOrderStatus(orderId, newStatus);
-        if (result.success) {
-            mutate(); // Refresh the data
+        if (result.success) mutate();
+    }
+
+    // ─── Excel Export ─────────────────────────────────────────────────────────
+    /**
+     * Logic breakdown:
+     * 1. Flatten filteredOrders into one row PER ITEM (multi-item orders repeat order metadata)
+     * 2. Map to plain objects matching the required column schema
+     * 3. Convert to XLSX worksheet via XLSX.utils.json_to_sheet
+     * 4. Set column widths for readability in Excel
+     * 5. Embed in a workbook and trigger browser download — fully client-side, no server call
+     */
+    async function handleExport() {
+        setExporting(true);
+        try {
+            // Step 1 — flatten: one row per item
+            const rows = filteredOrders.flatMap((order) =>
+                order.items.map((item) => ({
+                    'Order ID': order.id.slice(-8).toUpperCase(),
+                    'Date': new Date(order.createdAt).toLocaleString('en-IN'),
+                    'Customer Name': order.customerName,
+                    'Customer Phone': order.customerPhone,
+                    'Table': order.tableNumber,
+                    'Product': item.name,
+                    'Qty': item.quantity,
+                    'Unit Price (₹)': item.price,
+                    'Item Total (₹)': item.price * item.quantity,
+                    'Order Total (₹)': order.totalAmount,
+                    'Status': order.status.toUpperCase(),
+                }))
+            );
+
+            if (rows.length === 0) {
+                alert('No orders match the current filters.');
+                return;
+            }
+
+            // Step 2 — build worksheet
+            const ws = XLSX.utils.json_to_sheet(rows);
+
+            // Step 3 — set column widths
+            ws['!cols'] = [
+                { wch: 12 }, // Order ID
+                { wch: 20 }, // Date
+                { wch: 18 }, // Customer Name
+                { wch: 14 }, // Phone
+                { wch: 7 },  // Table
+                { wch: 22 }, // Product
+                { wch: 5 },  // Qty
+                { wch: 14 }, // Unit Price
+                { wch: 14 }, // Item Total
+                { wch: 14 }, // Order Total
+                { wch: 12 }, // Status
+            ];
+
+            // Step 4 — embed in workbook
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Orders');
+
+            // Step 5 — download
+            const timestamp = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(wb, `manomay-orders-${timestamp}.xlsx`);
+        } finally {
+            setExporting(false);
         }
     }
+    // ──────────────────────────────────────────────────────────────────────────
 
     const statusColors: Record<string, string> = {
         placed: 'bg-blue-100 text-blue-700',
@@ -70,38 +146,83 @@ export default function OrderList({
         cancelled: 'bg-red-100 text-red-700',
     };
 
-    if (orders.length === 0) {
-        return (
-            <div className="text-center py-12 bg-white rounded-2xl border border-slate-200">
-                <div className="text-6xl mb-4">📋</div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">No orders yet</h3>
-                <p className="text-slate-600">Orders will appear here when customers place them</p>
-            </div>
-        );
-    }
-
     return (
         <div>
-            {/* Filter Tabs */}
-            <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-                {['all', 'placed', 'preparing', 'ready', 'delivered'].map((status) => (
-                    <button
-                        key={status}
-                        onClick={() => setFilter(status)}
-                        className={`px-4 py-2 rounded-xl font-medium capitalize whitespace-nowrap transition ${filter === status
-                            ? 'bg-orange-600 text-white'
-                            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
-                            }`}
-                    >
-                        {status}
-                    </button>
-                ))}
+            {/* ── Toolbar ──────────────────────────────────────────────────── */}
+            <div className="flex flex-wrap gap-3 items-center justify-between mb-6">
+                {/* Status filter tabs */}
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                    {['all', 'placed', 'preparing', 'ready', 'delivered', 'cancelled'].map((status) => (
+                        <button
+                            key={status}
+                            onClick={() => setStatusFilter(status)}
+                            className={`px-4 py-2 rounded-xl font-medium capitalize whitespace-nowrap transition text-sm ${statusFilter === status
+                                    ? 'bg-orange-600 text-white shadow-md'
+                                    : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                                }`}
+                        >
+                            {status}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Export button */}
+                <button
+                    onClick={handleExport}
+                    disabled={exporting || filteredOrders.length === 0}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300 text-white font-bold rounded-xl transition shadow-sm whitespace-nowrap"
+                >
+                    {exporting ? (
+                        <>
+                            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            Generating…
+                        </>
+                    ) : (
+                        <>📥 Export to Excel</>
+                    )}
+                </button>
             </div>
 
-            {/* Orders List */}
+            {/* ── Date Range Filter ─────────────────────────────────────────── */}
+            <div className="flex flex-wrap gap-3 items-center mb-6 p-4 bg-white rounded-xl border border-slate-200">
+                <span className="text-sm font-semibold text-slate-600">📅 Date Range:</span>
+                <div className="flex items-center gap-2">
+                    <label className="text-xs text-slate-500">From</label>
+                    <input
+                        type="date"
+                        value={dateFrom}
+                        onChange={(e) => setDateFrom(e.target.value)}
+                        className="text-sm px-3 py-1.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    />
+                </div>
+                <div className="flex items-center gap-2">
+                    <label className="text-xs text-slate-500">To</label>
+                    <input
+                        type="date"
+                        value={dateTo}
+                        onChange={(e) => setDateTo(e.target.value)}
+                        className="text-sm px-3 py-1.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    />
+                </div>
+                {(dateFrom || dateTo) && (
+                    <button
+                        onClick={() => { setDateFrom(''); setDateTo(''); }}
+                        className="text-xs text-red-500 hover:text-red-700 font-medium underline"
+                    >
+                        Clear dates
+                    </button>
+                )}
+                <span className="ml-auto text-xs text-slate-500">
+                    {filteredOrders.length} order{filteredOrders.length !== 1 ? 's' : ''} shown
+                </span>
+            </div>
+
+            {/* ── Orders List ───────────────────────────────────────────────── */}
             {filteredOrders.length === 0 ? (
-                <div className="text-center py-8 bg-white rounded-2xl border border-slate-200">
-                    <p className="text-slate-600">No {filter} orders</p>
+                <div className="text-center py-12 bg-white rounded-2xl border border-slate-200">
+                    <div className="text-6xl mb-4">📋</div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">No orders match filters</h3>
+                    <p className="text-slate-600">Try changing the status or date range</p>
                 </div>
             ) : (
                 <div className="space-y-4">
@@ -135,9 +256,7 @@ export default function OrderList({
                             <div className="mb-4 pb-4 border-b border-slate-100">
                                 {order.items.map((item, idx) => (
                                     <div key={idx} className="flex justify-between text-sm py-1">
-                                        <span className="text-slate-700">
-                                            {item.name} x {item.quantity}
-                                        </span>
+                                        <span className="text-slate-700">{item.name} x {item.quantity}</span>
                                         <span className="font-medium">₹{item.price * item.quantity}</span>
                                     </div>
                                 ))}
@@ -148,8 +267,6 @@ export default function OrderList({
                                 <span className="text-xl font-bold text-orange-600">
                                     Total: ₹{order.totalAmount}
                                 </span>
-
-                                {/* Status Update Buttons */}
                                 <div className="flex gap-2">
                                     {order.status === 'placed' && (
                                         <button

@@ -108,13 +108,19 @@ export async function getVendorStats() {
 
         const stats = orderStats[0] || { ordersToday: 0, revenueToday: 0 };
 
+        // Additional KPI counts for dashboard banner + KPI cards
+        const pendingOrders = await Order.countDocuments({ shopId: shop._id, status: 'placed' });
+        const outOfStockProducts = await Product.countDocuments({ shopId: shop._id, isAvailable: false });
+
         return {
             success: true,
             stats: {
                 totalProducts,
                 activeProducts,
                 ordersToday: stats.ordersToday,
-                revenueToday: stats.revenueToday
+                revenueToday: stats.revenueToday,
+                pendingOrders,
+                outOfStockProducts,
             }
         };
     } catch (error: any) {
