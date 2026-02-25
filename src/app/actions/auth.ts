@@ -3,6 +3,7 @@
 import connectDB from '@/lib/db';
 import User from '@/models/User';
 import { hashPassword, verifyPassword, createToken, setAuthCookie, clearAuthCookie, getSession } from '@/lib/auth';
+export type { }; // keep module boundary
 import { redirect } from 'next/navigation';
 
 /**
@@ -102,6 +103,53 @@ export async function vendorLogin(formData: FormData) {
         return { success: true };
     } catch (error: any) {
         console.error('Vendor login error:', error);
+        return { success: false, error: error.message || 'Login failed' };
+    }
+}
+
+/**
+ * Admin Login (super-admin only)
+ */
+export async function adminLogin(formData: FormData) {
+    try {
+        await connectDB();
+
+        const email = formData.get('email') as string;
+        const password = formData.get('password') as string;
+
+        if (!email || !password) {
+            return { success: false, error: 'Email and password are required' };
+        }
+
+        // Find user
+        const user = await User.findOne({ email: email.toLowerCase() });
+        if (!user) {
+            return { success: false, error: 'Invalid credentials' };
+        }
+
+        // Must be super-admin
+        if (user.role !== 'super-admin') {
+            return { success: false, error: 'Access denied — admin only' };
+        }
+
+        // Verify password
+        const isValid = await verifyPassword(password, user.password);
+        if (!isValid) {
+            return { success: false, error: 'Invalid credentials' };
+        }
+
+        // Create JWT
+        const token = createToken({
+            userId: user._id.toString(),
+            email: user.email,
+            name: user.name,
+            role: user.role,
+        });
+
+        await setAuthCookie(token);
+        return { success: true };
+    } catch (error: any) {
+        console.error('Admin login error:', error);
         return { success: false, error: error.message || 'Login failed' };
     }
 }

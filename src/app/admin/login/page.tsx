@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { vendorLogin } from '@/app/actions/auth';
+import { adminLogin } from '@/app/actions/auth';
 import Link from 'next/link';
 
 export default function AdminLoginPage() {
@@ -16,7 +16,7 @@ export default function AdminLoginPage() {
         setError('');
 
         const formData = new FormData(e.currentTarget);
-        const result = await vendorLogin(formData); // Using same login, role check happens server-side
+        const result = await adminLogin(formData);
 
         if (result.success) {
             router.push('/admin/dashboard');
