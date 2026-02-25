@@ -3,7 +3,6 @@
 import connectDB from '@/lib/db';
 import User from '@/models/User';
 import { hashPassword, verifyPassword, createToken, setAuthCookie, clearAuthCookie, getSession } from '@/lib/auth';
-export type { }; // keep module boundary
 import { redirect } from 'next/navigation';
 
 /**
