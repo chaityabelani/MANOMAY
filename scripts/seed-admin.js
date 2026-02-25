@@ -28,7 +28,8 @@ const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, default: 'user' },
+    role: { type: String, default: 'customer' },
+    shopId: { type: mongoose.Schema.Types.ObjectId },
 }, { timestamps: true });
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
@@ -44,28 +45,34 @@ async function seedAdmin() {
         console.log('🔌 Connected to MongoDB');
 
         const email = 'admin@manomay.com';
-        const password = 'admin123'; // Change this purely for initial seed
+        const password = 'admin123';
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const existingUser = await User.findOne({ email });
 
         if (existingUser) {
-            console.log('⚠️ Admin user already exists. Updating password...');
+            console.log('⚠️  Admin user already exists — updating role and password...');
             existingUser.password = hashedPassword;
-            existingUser.role = 'admin';
+            existingUser.role = 'super-admin';  // ✅ correct role
             await existingUser.save();
-            console.log('✅ Admin password reset to: admin123');
+            console.log('✅ Admin updated successfully');
         } else {
             await User.create({
-                name: 'Admin User',
+                name: 'Super Admin',
                 email,
                 password: hashedPassword,
-                role: 'admin',
+                role: 'super-admin',  // ✅ correct role
             });
-            console.log('✅ Admin user created');
-            console.log(`📧 Email: ${email}`);
-            console.log(`🔑 Password: ${password}`);
+            console.log('✅ Super admin created');
         }
+
+        console.log('');
+        console.log('─────────────────────────────');
+        console.log(`  URL:      /admin/login`);
+        console.log(`  Email:    ${email}`);
+        console.log(`  Password: ${password}`);
+        console.log('─────────────────────────────');
+        console.log('');
 
         await mongoose.connection.close();
         process.exit(0);
