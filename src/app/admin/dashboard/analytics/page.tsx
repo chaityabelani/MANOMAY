@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { getPlatformAnalytics } from '@/app/actions/analytics';
+import useSWR from 'swr';
 import Link from 'next/link';
 import { Store, Package, ShoppingCart, DollarSign, TrendingUp, AlertCircle } from 'lucide-react';
 import BackButton from '@/components/BackButton';
+import { getPlatformAnalytics } from '@/app/actions/analytics';
 
 type Analytics = {
     overview: {
@@ -24,39 +24,32 @@ type Analytics = {
     }>;
 };
 
+// SWR fetcher wrapping the server action
+const fetcher = async () => {
+    const result = await getPlatformAnalytics();
+    if (!result.success) throw new Error(result.error || 'Failed to load analytics');
+    return result.analytics as Analytics;
+};
+
 export default function AnalyticsPage() {
-    const [analytics, setAnalytics] = useState<Analytics | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-
-    useEffect(() => {
-        loadAnalytics();
-    }, []);
-
-    async function loadAnalytics() {
-        try {
-            setLoading(true);
-            setError('');
-            const result = await getPlatformAnalytics();
-
-            if (result.success && result.analytics) {
-                setAnalytics(result.analytics as Analytics);
-            } else {
-                setError(result.error || 'Failed to load analytics');
-            }
-        } catch (err: any) {
-            console.error('Load analytics error:', err);
-            setError(err.message || 'Unexpected error');
-        } finally {
-            setLoading(false);
+    const { data: analytics, isLoading, error, mutate, isValidating } = useSWR<Analytics>(
+        'platform-analytics',
+        fetcher,
+        {
+            refreshInterval: 30000,   // Refresh every 30 seconds
+            revalidateOnFocus: true,
         }
-    }
+    );
 
     return (
         <div className="min-h-screen bg-slate-50">
             <header className="bg-white border-b border-slate-200">
-                <div className="container mx-auto px-6 py-4">
+                <div className="container mx-auto px-6 py-4 flex items-center justify-between">
                     <BackButton href="/admin/dashboard" label="Back to Dashboard" />
+                    <div className="flex items-center gap-2 text-xs text-slate-500">
+                        <span className={`w-2 h-2 rounded-full ${isValidating ? 'bg-orange-400 animate-pulse' : 'bg-green-400'}`} />
+                        {isValidating ? 'Refreshing…' : 'Live · 30s'}
+                    </div>
                 </div>
             </header>
 
@@ -64,14 +57,14 @@ export default function AnalyticsPage() {
                 <div className="flex justify-between items-center mb-8">
                     <div>
                         <h1 className="text-4xl font-bold text-slate-900 mb-2">Platform Analytics</h1>
-                        <p className="text-slate-600">Monitor platform performance and growth</p>
+                        <p className="text-slate-600">Monitor performance — auto-refreshes every 30 seconds</p>
                     </div>
                     <button
-                        onClick={loadAnalytics}
-                        disabled={loading}
+                        onClick={() => mutate()}
+                        disabled={isLoading}
                         className="px-4 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50"
                     >
-                        {loading ? 'Loading...' : 'Refresh'}
+                        {isLoading ? 'Loading...' : '↻ Refresh'}
                     </button>
                 </div>
 
@@ -80,14 +73,14 @@ export default function AnalyticsPage() {
                         <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                         <div>
                             <h3 className="font-semibold text-red-900">Error Loading Analytics</h3>
-                            <p className="text-red-700 text-sm">{error}</p>
+                            <p className="text-red-700 text-sm">{error.message}</p>
                         </div>
                     </div>
                 )}
 
-                {loading ? (
+                {isLoading && !analytics ? (
                     <div className="text-center py-12">
-                        <div className="animate-spin w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full mx-auto"></div>
+                        <div className="animate-spin w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full mx-auto" />
                         <p className="text-slate-600 mt-4">Loading analytics...</p>
                     </div>
                 ) : analytics ? (
@@ -161,10 +154,7 @@ export default function AnalyticsPage() {
                                                     <p className="text-sm text-slate-600">{vendor.orderCount} orders</p>
                                                 </div>
                                             </div>
-                                            <div className="text-right">
-                                                <p className="font-bold text-2xl text-purple-600">₹{vendor.revenue.toLocaleString('en-IN')}</p>
-                                                <p className="text-sm text-slate-600">Revenue</p>
-                                            </div>
+                                            <p className="font-bold text-2xl text-purple-600">₹{vendor.revenue.toLocaleString('en-IN')}</p>
                                         </div>
                                     ))}
                                 </div>
