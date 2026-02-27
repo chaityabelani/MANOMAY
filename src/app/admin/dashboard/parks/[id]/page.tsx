@@ -6,11 +6,12 @@ import BackButton from '@/components/BackButton';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ParkDetailPage({ params }: { params: { id: string } }) {
+export default async function ParkDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const session = await getSession();
     if (!session || session.user.role !== 'super-admin') redirect('/admin/login');
 
-    const result = await getParkDetails(params.id);
+    const { id } = await params;
+    const result = await getParkDetails(id);
 
     if (!result.success || !result.park) {
         return (
