@@ -12,9 +12,9 @@ export async function vendorSignup(formData: FormData) {
     try {
         await connectDB();
 
-        const name = formData.get('name') as string;
-        const email = formData.get('email') as string;
-        const password = formData.get('password') as string;
+        const name = (formData.get('name') as string)?.trim();
+        const email = (formData.get('email') as string)?.trim();
+        const password = (formData.get('password') as string)?.trim();
 
         // Validation
         if (!name || !email || !password) {
@@ -64,8 +64,8 @@ export async function vendorLogin(formData: FormData) {
     try {
         await connectDB();
 
-        const email = formData.get('email') as string;
-        const password = formData.get('password') as string;
+        const email = (formData.get('email') as string)?.trim();
+        const password = (formData.get('password') as string)?.trim();
 
         if (!email || !password) {
             return { success: false, error: 'Email and password are required' };
@@ -113,8 +113,8 @@ export async function adminLogin(formData: FormData) {
     try {
         await connectDB();
 
-        const email = formData.get('email') as string;
-        const password = formData.get('password') as string;
+        const email = (formData.get('email') as string)?.trim();
+        const password = (formData.get('password') as string)?.trim();
 
         if (!email || !password) {
             return { success: false, error: 'Email and password are required' };
