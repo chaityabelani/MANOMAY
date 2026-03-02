@@ -29,7 +29,7 @@ export default function CartPage() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-slate-50 pb-8">
             {/* Header */}
             <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
                 <div className="container mx-auto px-4 py-4">
@@ -45,7 +45,7 @@ export default function CartPage() {
                 </div>
             </header>
 
-            <main className="container mx-auto px-4 py-8 max-w-4xl">
+            <main className="container mx-auto px-4 py-6 max-w-4xl">
                 {/* Items grouped by shop */}
                 <div className="space-y-6 mb-8">
                     {Array.from(itemsByShop.entries()).map(([shopId, shopItems]) => {

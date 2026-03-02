@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ShoppingBag, Sparkles, Zap, Users, QrCode, Store } from 'lucide-react';
+import { ShoppingBag, Sparkles, Zap, Users, QrCode, Store, Menu } from 'lucide-react';
 
 export default function HomePage() {
     return (
@@ -12,17 +12,20 @@ export default function HomePage() {
 
             {/* Navigation */}
             <nav className="relative z-10 border-b border-white/10 backdrop-blur-xl bg-white/5">
-                <div className="container mx-auto px-6 py-4">
+                <div className="container mx-auto px-4 sm:px-6 py-4">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-brand-500 to-pink-500 rounded-xl flex items-center justify-center">
-                                <span className="text-2xl">🍽️</span>
+                        {/* Logo */}
+                        <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-brand-500 to-pink-500 rounded-xl flex items-center justify-center">
+                                <span className="text-xl sm:text-2xl">🍽️</span>
                             </div>
-                            <h1 className="text-2xl font-bold bg-gradient-to-r from-brand-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+                            <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-brand-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
                                 MANOMAY
                             </h1>
                         </div>
-                        <div className="flex items-center gap-3">
+
+                        {/* Desktop Nav — hidden on mobile */}
+                        <div className="hidden sm:flex items-center gap-3">
                             <Link
                                 href="/customer/login"
                                 className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition backdrop-blur-sm border border-white/20"
@@ -42,40 +45,48 @@ export default function HomePage() {
                                 👑 Admin
                             </Link>
                         </div>
+
+                        {/* Mobile Nav — single primary CTA */}
+                        <Link
+                            href="/menu"
+                            className="sm:hidden px-4 py-2 rounded-full bg-brand-600 hover:bg-brand-500 text-white text-sm font-bold transition shadow-lg"
+                        >
+                            Order Now
+                        </Link>
                     </div>
                 </div>
             </nav>
 
             {/* Hero Section */}
-            <div className="relative z-10 container mx-auto px-6 py-20">
+            <div className="relative z-10 container mx-auto px-4 sm:px-6 py-12 sm:py-20">
                 <div className="text-center max-w-5xl mx-auto">
                     {/* Main Headline */}
                     <div className="mb-8 animate-fade-in">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6">
                             <Sparkles className="w-4 h-4 text-brand-400" />
-                            <span className="text-sm text-white/90">India's First AI-Powered Digital Food Court</span>
+                            <span className="text-xs sm:text-sm text-white/90">India's First AI-Powered Digital Food Court</span>
                         </div>
-                        <h1 className="text-7xl md:text-8xl font-black mb-6">
+                        <h1 className="text-4xl sm:text-6xl lg:text-8xl font-black mb-4 sm:mb-6">
                             <span className="bg-gradient-to-r from-brand-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
                                 Order Food
                             </span>
                             <br />
                             <span className="text-white">Like Never Before</span>
                         </h1>
-                        <p className="text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-base sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
                             Scan. Browse. Order from multiple vendors. All in one unified cart.
                             The future of food court ordering is here.
                         </p>
                     </div>
 
                     {/* CTA Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center mb-20">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-16 sm:mb-20">
                         <Link
                             href="/menu"
                             className="group relative px-8 py-4 rounded-2xl overflow-hidden"
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-brand-500 via-pink-500 to-purple-500 group-hover:scale-105 transition-transform"></div>
-                            <div className="relative flex items-center gap-3 text-white font-bold text-lg">
+                            <div className="relative flex items-center justify-center gap-3 text-white font-bold text-lg">
                                 <ShoppingBag className="w-6 h-6" />
                                 <span>Explore Menu</span>
                                 <Zap className="w-5 h-5 animate-pulse" />
@@ -86,11 +97,11 @@ export default function HomePage() {
                             className="px-8 py-4 rounded-2xl backdrop-blur-sm bg-white/10 hover:bg-white/20 border-2 border-white/30 text-white font-bold text-lg transition flex items-center gap-3 justify-center"
                         >
                             <Users className="w-6 h-6" />
-                            <span>Sign Up as Customer</span>
+                            <span>Sign Up Free</span>
                         </Link>
                         <Link
                             href="/vendor/signup"
-                            className="px-8 py-4 rounded-2xl backdrop-blur-sm bg-white/10 hover:bg-white/20 border-2 border-white/30 text-white font-bold text-lg transition flex items-center gap-3 justify-center"
+                            className="hidden sm:flex px-8 py-4 rounded-2xl backdrop-blur-sm bg-white/10 hover:bg-white/20 border-2 border-white/30 text-white font-bold text-lg transition items-center gap-3 justify-center"
                         >
                             <Store className="w-6 h-6" />
                             <span>Join as Vendor</span>
