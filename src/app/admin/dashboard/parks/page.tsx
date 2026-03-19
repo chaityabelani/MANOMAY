@@ -2,7 +2,7 @@ import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { getAllParks } from '@/app/actions/admin';
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
+import { Plus, ArrowLeft } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,18 +19,27 @@ export default async function ParksPage() {
         <div className="min-h-screen bg-slate-50 p-6">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="flex justify-between items-center mb-8">
-                    <div>
-                        <h1 className="text-4xl font-bold text-slate-900">Food Parks</h1>
-                        <p className="text-slate-600">Manage all food court locations</p>
-                    </div>
+                <div className="mb-8">
                     <Link
-                        href="/admin/dashboard/parks/create"
-                        className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:shadow-xl transition flex items-center gap-2"
+                        href="/admin/dashboard"
+                        className="inline-flex items-center gap-2 text-slate-500 hover:text-purple-600 font-medium mb-4 transition"
                     >
-                        <Plus className="w-5 h-5" />
-                        Create New Park
+                        <ArrowLeft className="w-4 h-4" />
+                        Back to Dashboard
                     </Link>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-4xl font-bold text-slate-900">Food Parks</h1>
+                            <p className="text-slate-600">Manage all food court locations</p>
+                        </div>
+                        <Link
+                            href="/admin/dashboard/parks/create"
+                            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:shadow-xl transition flex items-center gap-2"
+                        >
+                            <Plus className="w-5 h-5" />
+                            Create New Park
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Parks Grid */}
@@ -67,8 +76,8 @@ export default async function ParksPage() {
                                     </div>
                                     <span
                                         className={`px-3 py-1 rounded-full text-xs font-bold ${park.isActive
-                                                ? 'bg-green-100 text-green-700'
-                                                : 'bg-red-100 text-red-700'
+                                            ? 'bg-green-100 text-green-700'
+                                            : 'bg-red-100 text-red-700'
                                             }`}
                                     >
                                         {park.isActive ? 'Active' : 'Inactive'}
